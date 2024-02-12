@@ -353,7 +353,7 @@ function Threat_OnUpdate()
   end
 
   if (ChallengingShoutCountdown >= 0 and (GetTime() - ChallengingLastBroadcastTime >= 1)) then
-    SendChatMessage("Challenging Shout ends in "..ChallengingShoutCountdown);
+    SendChatMessage("Challenging Shout ends in "..ChallengingShoutCountdown.." sec");
     ChallengingLastBroadcastTime = GetTime();
     ChallengingShoutCountdown = ChallengingShoutCountdown - 1;
   end
