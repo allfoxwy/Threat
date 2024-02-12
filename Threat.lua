@@ -1,6 +1,7 @@
 --[[
   Threat
   By: Ollowain.
+  Modified for Turtle: allfox.
 	Credit: Fury.lua by Bhaerau.
 ]]--
 
@@ -59,6 +60,21 @@ function SpellReady(spellname)
   if (id) then
     local start, duration = GetSpellCooldown(id, 0);
     if (start == 0 and duration == 0 and ThreatLastSpellCast + 1 <= GetTime()) then
+      return true;
+    end
+  end
+  return nil;
+end
+
+-- This function consider GCD still be ready state
+function SpellNearlyReady(spellname)
+  local id = SpellId(spellname);
+  if (id) then
+    local start, duration = GetSpellCooldown(id, 0);
+    if (start == 0 and duration == 0 and ThreatLastSpellCast + 1 <= GetTime()) then
+      return true;
+    end
+    if (start >= 0 and duration <= 1.6 and ThreatLastSpellCast + 1 <= GetTime()) then
       return true;
     end
   end
@@ -187,12 +203,12 @@ function EquippedShield()
 end
 
 function Threat()
-  --[[
+--[[
   if(GetTime() - LastTriggerThreatTime <= 0.5) then
     Debug("Trigger too fast, ignoring");
     return
   end
-  ]]
+]]
 
   if (not UnitIsCivilian("target") and UnitClass("player") == CLASS_WARRIOR_THREAT) then
     LastTriggerThreatTime = GetTime();
@@ -201,15 +217,17 @@ function Threat()
     local hp = UnitHealth("player");
     local maxhp = UnitHealthMax("player");
 
---[[if (not ThreatAttack) then
+    if (not ThreatAttack) then
       Debug("Starting AutoAttack");
       AttackTarget();
     end
-]]
+
+--[[
     if not IsCurrentAction(22) then
       Debug("Starting AutoAttack");
       UseAction(22);
     end
+]]
 
     if (ActiveStance() ~= 2) then
       Debug("Changing to def stance");
@@ -238,15 +256,15 @@ function Threat()
       elseif (SpellReady(ABILITY_BLOODTHIRST_THREAT) and rage >= 30 and BloodthirstLearned()) then
         Debug("Bloodthirst");
         CastSpellByName(ABILITY_BLOODTHIRST_THREAT);
-      elseif (not SpellReady(ABILITY_BLOODTHIRST_THREAT) and UnitIsUnit("targettarget", player) and SpellReady(ABILITY_SHIELD_BLOCK_THREAT) and EquippedShield() and rage >= 15 and (hp < maxhp)) then
+      elseif (not SpellNearlyReady(ABILITY_BLOODTHIRST_THREAT) and UnitIsUnit("targettarget", "player") and SpellReady(ABILITY_SHIELD_BLOCK_THREAT) and EquippedShield() and rage >= 15 and (hp < maxhp)) then
         Debug("Sheld Block normally");
         CastSpellByName(ABILITY_SHIELD_BLOCK_THREAT);
+      elseif (not SpellNearlyReady(ABILITY_BLOODTHIRST_THREAT) and SpellReady(ABILITY_SUNDER_ARMOR_THREAT) and rage >= 15 and not HasFiveSunderArmors("target")) then
+        Debug("Sunder Armor");
+        CastSpellByName(ABILITY_SUNDER_ARMOR_THREAT);
       elseif (SpellReady(ABILITY_HEROIC_STRIKE_THREAT) and rage >= 45) then
         Debug("Heroic strike");
         CastSpellByName(ABILITY_HEROIC_STRIKE_THREAT);
-      elseif (not SpellReady(ABILITY_BLOODTHIRST_THREAT) and SpellReady(ABILITY_SUNDER_ARMOR_THREAT) and rage >= 15 and not HasFiveSunderArmors("target")) then
-        Debug("Sunder Armor");
-        CastSpellByName(ABILITY_SUNDER_ARMOR_THREAT);
       end
     end
 

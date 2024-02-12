@@ -1,7 +1,7 @@
 ## Interface: 12000
 ## Title: Threat
 ## Notes: To make Warrior tanking easier.
-## Author: Ollowain
+## Author: Ollowain, allfox
 ## DefaultState: enabled
 ## OptionalDeps: none
 Threat.xml

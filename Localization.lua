@@ -2,6 +2,7 @@
 	Threat - English Localization
 
 	By: Ollowain
+	Modified for Turtle: allfox.
 ]]--
 
 BINDING_NAME_THREAT               = "Attack";
