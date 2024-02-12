@@ -9,6 +9,9 @@
 local RevengeReadyUntil = 0;
 local InCombat = false;
 local LastTriggerThreatTime = 0;
+local ChallengingShoutBroadcasted = false;
+local ChallengingShoutCountdown = -1;
+local ChallengingLastBroadcastTime = 0;
 
 function Threat_Configuration_Init()
   if (not Threat_Configuration) then
@@ -305,6 +308,8 @@ function Threat_OnLoad()
   this:RegisterEvent("CHAT_MSG_SPELL_SELF_DAMAGE");
 
   ThreatLastSpellCast = GetTime();
+  ChallengingShoutBroadcasted = not SpellReady(ABILITY_CHALLENGING_SHOUT_THREAT);
+
   SlashCmdList["MYTHREAT"] = Threat_SlashCommand;
   SLASH_MYTHREAT1 = "/mythreat";
 end
@@ -321,7 +326,14 @@ function Threat_OnEvent(event)
   elseif (event == "PLAYER_REGEN_ENABLED") then
     InCombat = false;
   elseif (event == "CHAT_MSG_SPELL_SELF_DAMAGE") then
-    return;
+    -- These resist check is taken from TankBuddy (https://github.com/srazdokunebil/TankBuddy/blob/main/TankBuddy.lua)
+    if (string.find(arg1, EVENT_CHECK_TAUNT_RESIST_THREAT)) then
+      SendChatMessage("Taunt RESISTED");
+    elseif (string.find(arg1, EVENT_FIRE_MOCKING_BLOW_THREAT)) then
+      if (not string.find(arg1, EVENT_HIT_MOCKING_BLOW_THREAT)) then
+        SendChatMessage("Mocking Blow MISSED");
+      end
+    end
   elseif (event == "CHAT_MSG_COMBAT_CREATURE_VS_SELF_MISSES")then
     if string.find(arg1,"You block")
     or string.find(arg1,"You parry")
@@ -333,6 +345,17 @@ function Threat_OnEvent(event)
 end
 
 function Threat_OnUpdate()
-  return;
+  if (ChallengingShoutBroadcasted and SpellReady(ABILITY_CHALLENGING_SHOUT_THREAT)) then
+    ChallengingShoutBroadcasted = false;
+  elseif (not ChallengingShoutBroadcasted and not SpellReady(ABILITY_CHALLENGING_SHOUT_THREAT)) then
+    ChallengingShoutBroadcasted = true;
+    ChallengingShoutCountdown = 5;
+  end
+
+  if (ChallengingShoutCountdown >= 0 and (GetTime() - ChallengingLastBroadcastTime >= 1)) then
+    SendChatMessage("Challenging Shout ends in "..ChallengingShoutCountdown);
+    ChallengingLastBroadcastTime = GetTime();
+    ChallengingShoutCountdown = ChallengingShoutCountdown - 1;
+  end
 end
 
