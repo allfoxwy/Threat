@@ -6,6 +6,8 @@
 
 -- Variables
 local RevengeReadyUntil = 0;
+local InCombat = false;
+local LastTriggerThreatTime = 0;
 
 function Threat_Configuration_Init()
   if (not Threat_Configuration) then
@@ -85,6 +87,22 @@ function ActiveStance()
   return nil;
 end
 
+function HasOneSunderArmor(unit)
+  local id = 1;
+  while (UnitDebuff(unit, id)) do
+    local debuffTexture, debuffAmount = UnitDebuff(unit, id);
+    if (string.find(debuffTexture, "Sunder")) then
+      if (debuffAmount >= 1) then
+        return true;
+      else
+        return nil;
+      end
+    end
+    id = id + 1;
+  end
+  return nil;
+end
+
 function HasFiveSunderArmors(unit)
   local id = 1;
   while (UnitDebuff(unit, id)) do
@@ -112,7 +130,7 @@ end
 function ShieldSlamLearned()
   if UnitClass("player") == "Warrior" then
     local _, _, _, _, ss = GetTalentInfo(3,17);
-    if (ss == 1) then
+    if (ss >= 1) then
       return true;
     else
       return nil;
@@ -120,15 +138,59 @@ function ShieldSlamLearned()
   end
 end
 
+function BloodthirstLearned()
+  if UnitClass("player") == "Warrior" then
+    local _, _, _, _, ss = GetTalentInfo(2,17);
+    if (ss >= 1) then
+      return true;
+    else
+      return nil;
+    end
+  end
+end
+
+function EquippedShield()
+  ThreatTooltip:SetOwner(UIParent, "ANCHOR_NONE");
+
+  local slotID = GetInventorySlotInfo("SecondaryHandSlot");
+  local link = GetInventoryItemLink("player", slotID);
+
+  if not link then
+    return nil;
+  end
+  
+  for i = 1, table.getn(KNOWN_SHIELDS_THREAT) do
+    if (string.find(link, KNOWN_SHIELDS_THREAT[i])) then
+      return true;
+    end
+  end
+
+  return false;
+end
 
 function Threat()
+  --[[
+  if(GetTime() - LastTriggerThreatTime <= 0.5) then
+    Debug("Trigger too fast, ignoring");
+    return
+  end
+  ]]
+
   if (not UnitIsCivilian("target") and UnitClass("player") == CLASS_WARRIOR_THREAT) then
+    LastTriggerThreatTime = GetTime();
 
     local rage = UnitMana("player");
+    local hp = UnitHealth("player");
+    local maxhp = UnitHealthMax("player");
 
-    if (not ThreatAttack) then
+--[[if (not ThreatAttack) then
       Debug("Starting AutoAttack");
       AttackTarget();
+    end
+]]
+    if not IsCurrentAction(22) then
+      Debug("Starting AutoAttack");
+      UseAction(22);
     end
 
     if (ActiveStance() ~= 2) then
@@ -136,21 +198,38 @@ function Threat()
       CastSpellByName(ABILITY_DEFENSIVE_STANCE_THREAT);
     end
 
-    if (SpellReady(ABILITY_BATTLE_SHOUT_THREAT) and not HasBuff("player", "Ability_Warrior_BattleShout") and rage >= 10) then
-      Debug("Battle Shout");
-      CastSpellByName(ABILITY_BATTLE_SHOUT_THREAT);
-    elseif (SpellReady(ABILITY_SHIELD_SLAM_THREAT) and rage >= 20 and ShieldSlamLearned()) then
-      Debug("Shield slam");
-      CastSpellByName(ABILITY_SHIELD_SLAM_THREAT);
-    elseif (SpellReady(ABILITY_REVENGE_THREAT) and RevengeAvail() and rage >= 5) then
-      Debug("Revenge");
-      CastSpellByName(ABILITY_REVENGE_THREAT);
-    elseif (SpellReady(ABILITY_SUNDER_ARMOR_THREAT) and rage >= 15 and not (HasFiveSunderArmors("target"))) then
-      Debug("Sunder armor");
-      CastSpellByName(ABILITY_SUNDER_ARMOR_THREAT);
-    elseif (SpellReady(ABILITY_HEROIC_STRIKE_THREAT) and rage >= 25) then
-      Debug("Heroic strike");
-      CastSpellByName(ABILITY_HEROIC_STRIKE_THREAT);
+    if (InCombat) then
+      if (SpellReady(ABILITY_BLOODRAGE_THREAT)) then
+        Debug("Bloodrage");
+        CastSpellByName(ABILITY_BLOODRAGE_THREAT);
+      elseif (SpellReady(ABILITY_REVENGE_THREAT) and RevengeAvail() and rage >= 5) then
+        Debug("Revenge");
+        CastSpellByName(ABILITY_REVENGE_THREAT);
+      elseif (rage >= 10 and (hp / maxhp * 100) < 40 and EquippedShield() and SpellReady(ABILITY_SHIELD_BLOCK_THREAT)) then
+        Debug("Sheld Block when HP < 40");
+        CastSpellByName(ABILITY_SHIELD_BLOCK_THREAT);
+      elseif (SpellReady(ABILITY_SUNDER_ARMOR_THREAT) and rage >= 15 and not HasOneSunderArmor("target")) then
+        Debug("First Sunder armor");
+        CastSpellByName(ABILITY_SUNDER_ARMOR_THREAT);
+      elseif (SpellReady(ABILITY_BATTLE_SHOUT_THREAT) and not HasBuff("player", "Ability_Warrior_BattleShout") and rage >= 10) then
+        Debug("Battle Shout");
+        CastSpellByName(ABILITY_BATTLE_SHOUT_THREAT);
+      elseif (SpellReady(ABILITY_SHIELD_SLAM_THREAT) and rage >= 20 and ShieldSlamLearned()) then
+        Debug("Shield slam");
+        CastSpellByName(ABILITY_SHIELD_SLAM_THREAT);
+      elseif (SpellReady(ABILITY_BLOODTHIRST_THREAT) and rage >= 30 and BloodthirstLearned()) then
+        Debug("Bloodthirst");
+        CastSpellByName(ABILITY_BLOODTHIRST_THREAT);
+      elseif (not SpellReady(ABILITY_BLOODTHIRST_THREAT) and UnitIsUnit("targettarget", player) and SpellReady(ABILITY_SHIELD_BLOCK_THREAT) and EquippedShield() and rage >= 15 and (hp < maxhp)) then
+        Debug("Sheld Block normally");
+        CastSpellByName(ABILITY_SHIELD_BLOCK_THREAT);
+      elseif (SpellReady(ABILITY_HEROIC_STRIKE_THREAT) and rage >= 45) then
+        Debug("Heroic strike");
+        CastSpellByName(ABILITY_HEROIC_STRIKE_THREAT);
+      elseif (not SpellReady(ABILITY_BLOODTHIRST_THREAT) and SpellReady(ABILITY_SUNDER_ARMOR_THREAT) and rage >= 15 and not HasFiveSunderArmors("target")) then
+        Debug("Sunder Armor");
+        CastSpellByName(ABILITY_SUNDER_ARMOR_THREAT);
+      end
     end
 
   end
@@ -184,12 +263,14 @@ function Threat_OnLoad()
   this:RegisterEvent("VARIABLES_LOADED");
   this:RegisterEvent("PLAYER_ENTER_COMBAT");
   this:RegisterEvent("PLAYER_LEAVE_COMBAT");
+  this:RegisterEvent("PLAYER_REGEN_DISABLED");
+  this:RegisterEvent("PLAYER_REGEN_ENABLED");
   this:RegisterEvent("CHAT_MSG_COMBAT_CREATURE_VS_SELF_MISSES");
 
   ThreatLastSpellCast = GetTime();
   ThreatLastStanceCast = GetTime();
-  SlashCmdList["THREAT"] = Threat_SlashCommand;
-  SLASH_THREAT1 = "/threat";
+  SlashCmdList["MYTHREAT"] = Threat_SlashCommand;
+  SLASH_MYTHREAT1 = "/mythreat";
 end
 
 function Threat_OnEvent(event)
@@ -199,6 +280,10 @@ function Threat_OnEvent(event)
     ThreatAttack = true;
   elseif (event == "PLAYER_LEAVE_COMBAT") then
     ThreatAttack = nil;
+  elseif (event == "PLAYER_REGEN_DISABLED") then
+    InCombat = true;
+  elseif (event == "PLAYER_REGEN_ENABLED") then
+    InCombat = false;
   elseif (event == "CHAT_MSG_COMBAT_CREATURE_VS_SELF_MISSES")then
     if string.find(arg1,"You block")
     or string.find(arg1,"You parry")

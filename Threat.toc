@@ -5,3 +5,4 @@
 ## DefaultState: enabled
 ## OptionalDeps: none
 Threat.xml
+Widgets.xml

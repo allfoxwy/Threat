@@ -37,6 +37,11 @@ ABILITY_SWEEPING_STRIKES_THREAT   = "Sweeping Strikes";
 ABILITY_TAUNT_THREAT              = "Taunt";
 ABILITY_THUNDER_CLAP_THREAT       = "Thunder Clap";
 
+KNOWN_SHIELDS_THREAT              = {
+	"Aegis of the Blood God",
+	"Hyperchromatic Deflector",
+};
+
 SLASH_THREAT_ENABLED              = "enabled";
 SLASH_THREAT_DISABLED             = "disabled";
 SLASH_THREAT_DEFAULT              = "default";
