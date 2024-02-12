@@ -302,9 +302,9 @@ function Threat_OnLoad()
   this:RegisterEvent("PLAYER_REGEN_DISABLED");
   this:RegisterEvent("PLAYER_REGEN_ENABLED");
   this:RegisterEvent("CHAT_MSG_COMBAT_CREATURE_VS_SELF_MISSES");
+  this:RegisterEvent("CHAT_MSG_SPELL_SELF_DAMAGE");
 
   ThreatLastSpellCast = GetTime();
-  ThreatLastStanceCast = GetTime();
   SlashCmdList["MYTHREAT"] = Threat_SlashCommand;
   SLASH_MYTHREAT1 = "/mythreat";
 end
@@ -320,6 +320,8 @@ function Threat_OnEvent(event)
     InCombat = true;
   elseif (event == "PLAYER_REGEN_ENABLED") then
     InCombat = false;
+  elseif (event == "CHAT_MSG_SPELL_SELF_DAMAGE") then
+    return;
   elseif (event == "CHAT_MSG_COMBAT_CREATURE_VS_SELF_MISSES")then
     if string.find(arg1,"You block")
     or string.find(arg1,"You parry")
@@ -329,3 +331,8 @@ function Threat_OnEvent(event)
     end
   end
 end
+
+function Threat_OnUpdate()
+  return;
+end
+

@@ -45,6 +45,10 @@ ITEM_ATTRIBUTE_MAINHAND_THREAT    = "Main Hand";
 ITEM_ATTRIBUTE_ONEHAND_THREAT     = "One-Hand";
 ITEM_ATTRIBUTE_TWOHAND_THREAT     = "Two-Hand";
 
+EVENT_CHECK_TAUNT_RESIST_THREAT   = "Your Taunt was resisted by (%w+)";
+EVENT_FIRE_MOCKING_BLOW_THREAT    = "(.*)Mocking Blow(.*)";
+EVENT_HIT_MOCKING_BLOW_THREAT     = "Your Mocking Blow (.+) for (.+)";
+
 SLASH_THREAT_ENABLED              = "enabled";
 SLASH_THREAT_DISABLED             = "disabled";
 SLASH_THREAT_DEFAULT              = "default";
