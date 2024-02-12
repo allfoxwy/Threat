@@ -150,18 +150,36 @@ function BloodthirstLearned()
 end
 
 function EquippedShield()
+  -- Must do this SetOwner in this function, or tooltip would be blank
   ThreatTooltip:SetOwner(UIParent, "ANCHOR_NONE");
 
-  local slotID = GetInventorySlotInfo("SecondaryHandSlot");
-  local link = GetInventoryItemLink("player", slotID);
-
-  if not link then
+  local hasItem, hasCooldown, repairCost = ThreatTooltip:SetInventoryItem("player", GetInventorySlotInfo("SecondaryHandSlot"));
+  if not hasItem then
     return nil;
   end
-  
-  for i = 1, table.getn(KNOWN_SHIELDS_THREAT) do
-    if (string.find(link, KNOWN_SHIELDS_THREAT[i])) then
-      return true;
+
+  local lineCount = ThreatTooltip:NumLines();
+  for i = 1, lineCount do
+    local leftText = getglobal("ThreatTooltipTextLeft"..i);
+    local itemType = getglobal("ThreatTooltipTextRight"..i);
+
+    -- Some item has attribute "Unique" which would append 1 line in front of the type line
+    -- Check on left attribute to make sure we are looking into the type line
+    if(leftText:GetText() and 
+        (leftText:GetText() == ITEM_ATTRIBUTE_OFFHAND_THREAT or
+         leftText:GetText() == ITEM_ATTRIBUTE_MAINHAND_THREAT or
+         leftText:GetText() == ITEM_ATTRIBUTE_ONEHAND_THREAT or
+         leftText:GetText() == ITEM_ATTRIBUTE_TWOHAND_THREAT
+        )
+      ) then
+      
+      if(itemType:GetText() and itemType:GetText() == ITEM_TYPE_SHIELD_THREAT) then
+        return true;
+      else
+        -- Some item would bug on labels, showing past info instead of current.
+        -- However, It looks the very first info would be OK.
+        return false;
+      end
     end
   end
 

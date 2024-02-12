@@ -37,10 +37,12 @@ ABILITY_SWEEPING_STRIKES_THREAT   = "Sweeping Strikes";
 ABILITY_TAUNT_THREAT              = "Taunt";
 ABILITY_THUNDER_CLAP_THREAT       = "Thunder Clap";
 
-KNOWN_SHIELDS_THREAT              = {
-	"Aegis of the Blood God",
-	"Hyperchromatic Deflector",
-};
+ITEM_TYPE_SHIELD_THREAT           = "Shield";
+
+ITEM_ATTRIBUTE_OFFHAND_THREAT     = "Off Hand";
+ITEM_ATTRIBUTE_MAINHAND_THREAT    = "Main Hand";
+ITEM_ATTRIBUTE_ONEHAND_THREAT     = "One-Hand";
+ITEM_ATTRIBUTE_TWOHAND_THREAT     = "Two-Hand";
 
 SLASH_THREAT_ENABLED              = "enabled";
 SLASH_THREAT_DISABLED             = "disabled";

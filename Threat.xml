@@ -10,6 +10,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ C:\Projects\WoW\Bin\Interfac
   <Script file="Threat.lua"/>
 
   <!-- My AddOn Frames -->
+  <GameTooltip name="ThreatTooltip" frameStrata="TOOLTIP" hidden="true" parent="UIParent" inherits="GameTooltipTemplate"/>
   <Frame name="ThreatFrame" parent="UIParent">
     <Scripts>
       <OnLoad>
