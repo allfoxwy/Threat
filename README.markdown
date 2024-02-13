@@ -35,16 +35,23 @@ Bind the macro to a key and spam it to generate threat.
 ## Credit
 
 Original addon Threat (https://github.com/muellerj/Threat)
+
 Idea to check taunt resist is taken from Tank buddy (https://github.com/srazdokunebil/TankBuddy)
+
 Idea to check if offhand holding a shield is tanken from Roid Macros (https://denniswg.github.io/Roid-Macros/)
 
 The original addon has not been updated for years. It only support Shield Slam so modern fury-protection tank can't use it.
+
 After fighting against Super Macro's bugs and got slienced by GM because some of my macros misbehaving spam World chat. I decide to make this.
+
 I don't have a druid nor paladin toon. So this addon only work for warriors.
 
 About ethic concerns about this addon might take fun away from tanks:
 > When healers one-key spam QuckHeal (https://github.com/Zebouski/QuickHeal)
+>
 > DDs one-key spam Execution without reading even nor having a threat meter (https://github.com/balakethelock/TWThreat)
+>
 > Why would we tanks must work so hard to take all the blame of death/wipe/guild dismiss?
+>
 > I, as a tank, would also one-key spam into endgame.
 
