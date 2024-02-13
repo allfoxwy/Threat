@@ -49,11 +49,10 @@ After fighting against Super Macro's bugs and got slienced by GM because some of
 I don't have a druid nor paladin toon. So this addon only work for warriors.
 
 About ethic concerns about this addon might take fun away from tanks:
-> When healers one-key spam QuckHeal (https://github.com/Zebouski/QuickHeal)
+> Today healers one-key spam QuckHeal (https://github.com/Zebouski/QuickHeal)
 >
 > DDs one-key spam Execution without reading even nor having a threat meter (https://github.com/balakethelock/TWThreat)
 >
-> Why would we tanks must work so hard to take all the blame of death/wipe/guild dismiss?
->
-> I, as a tank, would also one-key spam into endgame.
+> I think tanks should have their own addon to easy their life.
+
 
