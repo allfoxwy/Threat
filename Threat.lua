@@ -8,8 +8,8 @@
 -- Variables
 local RevengeReadyUntil = 0;
 local InCombat = false;
-local LastTriggerThreatTime = 0;
-local ChallengingShoutBroadcasted = false;
+local ThreatLastSpellCast = 0
+local ChallengingShoutBroadcasted = true;
 local ChallengingShoutCountdown = -1;
 local ChallengingLastBroadcastTime = 0;
 
@@ -169,6 +169,7 @@ function BloodthirstLearned()
 end
 
 function EquippedShield()
+  -- The idea of using tooltip to decide if offhand has a shiled is taken from Roid Macros (https://denniswg.github.io/Roid-Macros/)
   -- Must do this SetOwner in this function, or tooltip would be blank
   ThreatTooltip:SetOwner(UIParent, "ANCHOR_NONE");
 
@@ -206,15 +207,7 @@ function EquippedShield()
 end
 
 function Threat()
---[[
-  if(GetTime() - LastTriggerThreatTime <= 0.5) then
-    Debug("Trigger too fast, ignoring");
-    return
-  end
-]]
-
   if (not UnitIsCivilian("target") and UnitClass("player") == CLASS_WARRIOR_THREAT) then
-    LastTriggerThreatTime = GetTime();
 
     local rage = UnitMana("player");
     local hp = UnitHealth("player");
@@ -238,10 +231,12 @@ function Threat()
     end
 
     if (InCombat) then
+      --[[
       if (SpellReady(ABILITY_BLOODRAGE_THREAT)) then
         Debug("Bloodrage");
         CastSpellByName(ABILITY_BLOODRAGE_THREAT);
-      elseif (SpellReady(ABILITY_REVENGE_THREAT) and RevengeAvail() and rage >= 5) then
+      ]]
+      if (SpellReady(ABILITY_REVENGE_THREAT) and RevengeAvail() and rage >= 5) then
         Debug("Revenge");
         CastSpellByName(ABILITY_REVENGE_THREAT);
       elseif (rage >= 10 and (hp / maxhp * 100) < 40 and EquippedShield() and SpellReady(ABILITY_SHIELD_BLOCK_THREAT)) then
@@ -250,19 +245,31 @@ function Threat()
       elseif (SpellReady(ABILITY_SUNDER_ARMOR_THREAT) and rage >= 15 and not HasOneSunderArmor("target")) then
         Debug("First Sunder armor");
         CastSpellByName(ABILITY_SUNDER_ARMOR_THREAT);
-      elseif (SpellReady(ABILITY_BATTLE_SHOUT_THREAT) and not HasBuff("player", "Ability_Warrior_BattleShout") and rage >= 10) then
-        Debug("Battle Shout");
-        CastSpellByName(ABILITY_BATTLE_SHOUT_THREAT);
       elseif (SpellReady(ABILITY_SHIELD_SLAM_THREAT) and rage >= 20 and ShieldSlamLearned()) then
         Debug("Shield slam");
         CastSpellByName(ABILITY_SHIELD_SLAM_THREAT);
+      elseif (SpellReady(ABILITY_BATTLE_SHOUT_THREAT) and not HasBuff("player", "Ability_Warrior_BattleShout") and rage >= 10) then
+        Debug("Battle Shout");
+        CastSpellByName(ABILITY_BATTLE_SHOUT_THREAT);
       elseif (SpellReady(ABILITY_BLOODTHIRST_THREAT) and rage >= 30 and BloodthirstLearned()) then
         Debug("Bloodthirst");
         CastSpellByName(ABILITY_BLOODTHIRST_THREAT);
-      elseif (not SpellNearlyReady(ABILITY_BLOODTHIRST_THREAT) and UnitIsUnit("targettarget", "player") and SpellReady(ABILITY_SHIELD_BLOCK_THREAT) and EquippedShield() and rage >= 15 and (hp < maxhp)) then
+      elseif (((BloodthirstLearned() and not SpellNearlyReady(ABILITY_BLOODTHIRST_THREAT)) or 
+                (ShieldSlamLearned() and not SpellNearlyReady(ABILITY_SHIELD_SLAM_THREAT)) or 
+                (not BloodthirstLearned() and not ShieldSlamLearned())) and 
+              UnitIsUnit("targettarget", "player") and 
+              SpellReady(ABILITY_SHIELD_BLOCK_THREAT) and 
+              EquippedShield() and rage >= 15 and 
+              (hp < maxhp)) then
         Debug("Sheld Block normally");
         CastSpellByName(ABILITY_SHIELD_BLOCK_THREAT);
-      elseif (not SpellNearlyReady(ABILITY_BLOODTHIRST_THREAT) and SpellReady(ABILITY_SUNDER_ARMOR_THREAT) and rage >= 15 and not HasFiveSunderArmors("target")) then
+      elseif (((BloodthirstLearned() and not SpellNearlyReady(ABILITY_BLOODTHIRST_THREAT)) or 
+                (ShieldSlamLearned() and not SpellNearlyReady(ABILITY_SHIELD_SLAM_THREAT)) or 
+                (ShieldSlamLearned() and not EquippedShield()) or 
+                (not BloodthirstLearned() and not ShieldSlamLearned())) and 
+              SpellReady(ABILITY_SUNDER_ARMOR_THREAT) and 
+              rage >= 15 and 
+              not HasFiveSunderArmors("target")) then
         Debug("Sunder Armor");
         CastSpellByName(ABILITY_SUNDER_ARMOR_THREAT);
       elseif (SpellReady(ABILITY_HEROIC_STRIKE_THREAT) and rage >= 45) then
@@ -270,7 +277,6 @@ function Threat()
         CastSpellByName(ABILITY_HEROIC_STRIKE_THREAT);
       end
     end
-
   end
 end
 
@@ -310,8 +316,8 @@ function Threat_OnLoad()
   ThreatLastSpellCast = GetTime();
   ChallengingShoutBroadcasted = not SpellReady(ABILITY_CHALLENGING_SHOUT_THREAT);
 
-  SlashCmdList["MYTHREAT"] = Threat_SlashCommand;
-  SLASH_MYTHREAT1 = "/mythreat";
+  SlashCmdList["WARRTHREAT"] = Threat_SlashCommand;
+  SLASH_WARRTHREAT1 = "/warrthreat";
 end
 
 function Threat_OnEvent(event)
@@ -344,16 +350,21 @@ function Threat_OnEvent(event)
   end
 end
 
+
+
 function Threat_OnUpdate()
-  if (ChallengingShoutBroadcasted and SpellReady(ABILITY_CHALLENGING_SHOUT_THREAT)) then
+  if (ChallengingShoutBroadcasted and SpellNearlyReady(ABILITY_CHALLENGING_SHOUT_THREAT)) then
     ChallengingShoutBroadcasted = false;
-  elseif (not ChallengingShoutBroadcasted and not SpellReady(ABILITY_CHALLENGING_SHOUT_THREAT)) then
+  elseif (not ChallengingShoutBroadcasted and not SpellNearlyReady(ABILITY_CHALLENGING_SHOUT_THREAT)) then
     ChallengingShoutBroadcasted = true;
+
+    -- While Challenging Shout lasts 6 sec, the last sec message would show up as "1 sec left" if we count as 6,5,4,3,2,1, and keep displaying even that last sec has passed
+    -- Better let last sec show up as "0 sec left", so peeps get warned taunt is over
     ChallengingShoutCountdown = 5;
   end
 
   if (ChallengingShoutCountdown >= 0 and (GetTime() - ChallengingLastBroadcastTime >= 1)) then
-    SendChatMessage("Challenging Shout ends in "..ChallengingShoutCountdown.." sec");
+    SendChatMessage(ChallengingShoutCountdown.."  Challenging Shout ends in "..ChallengingShoutCountdown.." sec");
     ChallengingLastBroadcastTime = GetTime();
     ChallengingShoutCountdown = ChallengingShoutCountdown - 1;
   end
