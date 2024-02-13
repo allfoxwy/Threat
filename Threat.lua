@@ -43,7 +43,7 @@ end
 
 --------------------------------------------------
 
-function SpellId(spellname)
+local function SpellId(spellname)
   local id = 1;
   for i = 1, GetNumSpellTabs() do
     local _, _, _, numSpells = GetSpellTabInfo(i);
@@ -58,7 +58,7 @@ function SpellId(spellname)
   return nil;
 end
 
-function SpellReady(spellname)
+local function SpellReady(spellname)
   local id = SpellId(spellname);
   if (id) then
     local start, duration = GetSpellCooldown(id, 0);
@@ -70,7 +70,7 @@ function SpellReady(spellname)
 end
 
 -- This function consider GCD still be ready state
-function SpellNearlyReady(spellname)
+local function SpellNearlyReady(spellname)
   local id = SpellId(spellname);
   if (id) then
     local start, duration = GetSpellCooldown(id, 0);
@@ -84,7 +84,7 @@ function SpellNearlyReady(spellname)
   return nil;
 end
 
-function HasBuff(unit, texturename)
+local function HasBuff(unit, texturename)
   local id = 1;
   while (UnitBuff(unit, id)) do
     local buffTexture = UnitBuff(unit, id);
@@ -96,7 +96,7 @@ function HasBuff(unit, texturename)
   return nil;
 end
 
-function ActiveStance()
+local function ActiveStance()
   for i = 1, 3 do
     local _, _, active = GetShapeshiftFormInfo(i);
     if (active) then
@@ -106,7 +106,7 @@ function ActiveStance()
   return nil;
 end
 
-function HasOneSunderArmor(unit)
+local function HasOneSunderArmor(unit)
   local id = 1;
   while (UnitDebuff(unit, id)) do
     local debuffTexture, debuffAmount = UnitDebuff(unit, id);
@@ -122,7 +122,7 @@ function HasOneSunderArmor(unit)
   return nil;
 end
 
-function HasFiveSunderArmors(unit)
+local function HasFiveSunderArmors(unit)
   local id = 1;
   while (UnitDebuff(unit, id)) do
     local debuffTexture, debuffAmount = UnitDebuff(unit, id);
@@ -138,7 +138,7 @@ function HasFiveSunderArmors(unit)
   return nil;
 end
 
-function RevengeAvail()
+local function RevengeAvail()
   if GetTime() < RevengeReadyUntil then
     return true;
   else
@@ -146,7 +146,7 @@ function RevengeAvail()
   end
 end
 
-function ShieldSlamLearned()
+local function ShieldSlamLearned()
   if UnitClass("player") == "Warrior" then
     local _, _, _, _, ss = GetTalentInfo(3,17);
     if (ss >= 1) then
@@ -157,7 +157,7 @@ function ShieldSlamLearned()
   end
 end
 
-function BloodthirstLearned()
+local function BloodthirstLearned()
   if UnitClass("player") == "Warrior" then
     local _, _, _, _, ss = GetTalentInfo(2,17);
     if (ss >= 1) then
@@ -168,7 +168,7 @@ function BloodthirstLearned()
   end
 end
 
-function EquippedShield()
+local function EquippedShield()
   -- The idea of using tooltip to decide if offhand has a shiled is taken from Roid Macros (https://denniswg.github.io/Roid-Macros/)
   -- Must do this SetOwner in this function, or tooltip would be blank
   ThreatTooltip:SetOwner(UIParent, "ANCHOR_NONE");
