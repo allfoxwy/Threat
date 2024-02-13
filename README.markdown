@@ -4,6 +4,8 @@ A World of Warcraft Vanilla (v1.1.12) Addon to simplify Warrior tanking.
 
 Providing warrior tank a single button solution to generate threat on a single target.
 
+Built on Turtle WoW server.
+
 
 ## Installation
 
