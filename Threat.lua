@@ -247,13 +247,13 @@ function Threat()
         Debug("First/Refresh Sunder armor");
         CastSpellByName(ABILITY_SUNDER_ARMOR_THREAT);
         LastSunderArmorTime = GetTime();
-      elseif (SpellReady(ABILITY_SHIELD_SLAM_THREAT) and rage >= 20 and ShieldSlamLearned()) then
+      elseif (SpellReady(ABILITY_SHIELD_SLAM_THREAT) and rage >= 25 and ShieldSlamLearned()) then
         Debug("Shield slam");
         CastSpellByName(ABILITY_SHIELD_SLAM_THREAT);
-      elseif (SpellReady(ABILITY_BATTLE_SHOUT_THREAT) and not HasBuff("player", "Ability_Warrior_BattleShout") and rage >= 10) then
+      elseif (SpellReady(ABILITY_BATTLE_SHOUT_THREAT) and not HasBuff("player", "Ability_Warrior_BattleShout") and rage >= 15) then
         Debug("Battle Shout");
         CastSpellByName(ABILITY_BATTLE_SHOUT_THREAT);
-      elseif (SpellReady(ABILITY_BLOODTHIRST_THREAT) and rage >= 30 and BloodthirstLearned()) then
+      elseif (SpellReady(ABILITY_BLOODTHIRST_THREAT) and rage >= 35 and BloodthirstLearned()) then
         Debug("Bloodthirst");
         CastSpellByName(ABILITY_BLOODTHIRST_THREAT);
       elseif (((BloodthirstLearned() and not SpellNearlyReady(ABILITY_BLOODTHIRST_THREAT)) or 
@@ -270,12 +270,12 @@ function Threat()
                 (ShieldSlamLearned() and not EquippedShield()) or 
                 (not BloodthirstLearned() and not ShieldSlamLearned())) and 
               SpellReady(ABILITY_SUNDER_ARMOR_THREAT) and 
-              rage >= 15 and 
+              rage >= 20 and 
               not HasFiveSunderArmors("target")) then
         Debug("Sunder Armor");
         CastSpellByName(ABILITY_SUNDER_ARMOR_THREAT);
         LastSunderArmorTime = GetTime();
-      elseif (SpellReady(ABILITY_HEROIC_STRIKE_THREAT) and rage >= 45) then
+      elseif (SpellReady(ABILITY_HEROIC_STRIKE_THREAT) and rage >= 50) then
         Debug("Heroic strike");
         CastSpellByName(ABILITY_HEROIC_STRIKE_THREAT);
       end

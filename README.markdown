@@ -30,8 +30,8 @@ Bind the macro to a key and spam it to generate threat.
 - Buff self with Battle Shout
 - Use Bloodthrist or Shield Slam according to talents
 - Sunder Armor would be cast **only once** on engage to generate initial threat to hold mobs away from healer
-- After Bloodthrist and Shield Slam are in cooldown, apply Sunder Armor up to 5 stacks. No more than 5 stacks
-- Use Heroic Strike when rage more than 45
+- After Bloodthrist and Shield Slam are in cooldown, apply Sunder Armor up to 5 stacks. No more than 5 stacks. Refresh after 25 seconds.
+- Use Heroic Strike when rage overflow
 
 
 ## Credit
