@@ -12,6 +12,7 @@ local ThreatLastSpellCast = 0
 local ChallengingShoutBroadcasted = true;
 local ChallengingShoutCountdown = -1;
 local ChallengingLastBroadcastTime = 0;
+local LastSunderArmorTime = 0;
 
 function Threat_Configuration_Init()
   if (not Threat_Configuration) then
@@ -242,9 +243,10 @@ function Threat()
       elseif (rage >= 10 and (hp / maxhp * 100) < 40 and EquippedShield() and SpellReady(ABILITY_SHIELD_BLOCK_THREAT)) then
         Debug("Sheld Block when HP < 40");
         CastSpellByName(ABILITY_SHIELD_BLOCK_THREAT);
-      elseif (SpellReady(ABILITY_SUNDER_ARMOR_THREAT) and rage >= 15 and not HasOneSunderArmor("target")) then
-        Debug("First Sunder armor");
+      elseif (SpellReady(ABILITY_SUNDER_ARMOR_THREAT) and rage >= 15 and (not HasOneSunderArmor("target") or LastSunderArmorTime + 25 < GetTime())) then
+        Debug("First/Refresh Sunder armor");
         CastSpellByName(ABILITY_SUNDER_ARMOR_THREAT);
+        LastSunderArmorTime = GetTime();
       elseif (SpellReady(ABILITY_SHIELD_SLAM_THREAT) and rage >= 20 and ShieldSlamLearned()) then
         Debug("Shield slam");
         CastSpellByName(ABILITY_SHIELD_SLAM_THREAT);
@@ -272,6 +274,7 @@ function Threat()
               not HasFiveSunderArmors("target")) then
         Debug("Sunder Armor");
         CastSpellByName(ABILITY_SUNDER_ARMOR_THREAT);
+        LastSunderArmorTime = GetTime();
       elseif (SpellReady(ABILITY_HEROIC_STRIKE_THREAT) and rage >= 45) then
         Debug("Heroic strike");
         CastSpellByName(ABILITY_HEROIC_STRIKE_THREAT);
