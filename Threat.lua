@@ -337,16 +337,16 @@ function Threat_OnEvent(event)
   elseif (event == "CHAT_MSG_SPELL_SELF_DAMAGE") then
     -- These resist check is taken from TankBuddy (https://github.com/srazdokunebil/TankBuddy/blob/main/TankBuddy.lua)
     if (string.find(arg1, EVENT_CHECK_TAUNT_RESIST_THREAT)) then
-      SendChatMessage("Taunt RESISTED");
+      SendChatMessage(MESSAGE_TAUNT_RESIST_THREAT);
     elseif (string.find(arg1, EVENT_FIRE_MOCKING_BLOW_THREAT)) then
       if (not string.find(arg1, EVENT_HIT_MOCKING_BLOW_THREAT)) then
-        SendChatMessage("Mocking Blow MISSED");
+        SendChatMessage(MESSAGE_MOCKING_BLOW_MISS_THREAT);
       end
     end
   elseif (event == "CHAT_MSG_COMBAT_CREATURE_VS_SELF_MISSES")then
-    if string.find(arg1,"You block")
-    or string.find(arg1,"You parry")
-    or string.find(arg1,"You dodge") then
+    if string.find(arg1, EVENT_SELF_BLOCK_THREAT)
+    or string.find(arg1, EVENT_SELF_PARRY_THREAT)
+    or string.find(arg1, EVENT_SELF_DOGUE_THREAT) then
       Debug("Revenge soon ready");
       RevengeReadyUntil = GetTime() + 4;
     end
@@ -367,7 +367,7 @@ function Threat_OnUpdate()
   end
 
   if (ChallengingShoutCountdown >= 0 and (GetTime() - ChallengingLastBroadcastTime >= 1)) then
-    SendChatMessage(ChallengingShoutCountdown.."  Challenging Shout ends in "..ChallengingShoutCountdown.." sec");
+    SendChatMessage(ChallengingShoutCountdown..MESSAGE_CHALLENGING_SHOUT_THREAT..ChallengingShoutCountdown);
     ChallengingLastBroadcastTime = GetTime();
     ChallengingShoutCountdown = ChallengingShoutCountdown - 1;
   end

@@ -45,6 +45,13 @@ ITEM_ATTRIBUTE_MAINHAND_THREAT    = "Main Hand";
 ITEM_ATTRIBUTE_ONEHAND_THREAT     = "One-Hand";
 ITEM_ATTRIBUTE_TWOHAND_THREAT     = "Two-Hand";
 
+MESSAGE_TAUNT_RESIST_THREAT       = "Taunt RESISTED";
+MESSAGE_MOCKING_BLOW_MISS_THREAT  = "Mocking Blow MISSED";
+MESSAGE_CHALLENGING_SHOUT_THREAT  = "  Challenging Shout ends in ";
+
+EVENT_SELF_DOGUE_THREAT       = "You dodge";
+EVENT_SELF_PARRY_THREAT       = "You parry";
+EVENT_SELF_BLOCK_THREAT       = "You block";
 EVENT_CHECK_TAUNT_RESIST_THREAT   = "Your Taunt was resisted by (%w+)";
 EVENT_FIRE_MOCKING_BLOW_THREAT    = "(.*)Mocking Blow(.*)";
 EVENT_HIT_MOCKING_BLOW_THREAT     = "Your Mocking Blow (.+) for (.+)";
