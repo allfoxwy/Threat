@@ -13,6 +13,7 @@ local ChallengingShoutBroadcasted = true;
 local ChallengingShoutCountdown = -1;
 local ChallengingLastBroadcastTime = 0;
 local LastSunderArmorTime = 0;
+local LastBattleShoutAttemptTime = 0;
 
 function Threat_Configuration_Init()
   if (not Threat_Configuration) then
@@ -250,8 +251,9 @@ function Threat()
       elseif (SpellReady(ABILITY_SHIELD_SLAM_THREAT) and rage >= 25 and ShieldSlamLearned()) then
         Debug("Shield slam");
         CastSpellByName(ABILITY_SHIELD_SLAM_THREAT);
-      elseif (SpellReady(ABILITY_BATTLE_SHOUT_THREAT) and not HasBuff("player", "Ability_Warrior_BattleShout") and rage >= 15) then
+      elseif (SpellReady(ABILITY_BATTLE_SHOUT_THREAT) and not HasBuff("player", "Ability_Warrior_BattleShout") and rage >= 15 and (GetTime() - LastBattleShoutAttemptTime > 3)) then
         Debug("Battle Shout");
+        LastBattleShoutAttemptTime = GetTime();
         CastSpellByName(ABILITY_BATTLE_SHOUT_THREAT);
       elseif (SpellReady(ABILITY_BLOODTHIRST_THREAT) and rage >= 35 and BloodthirstLearned()) then
         Debug("Bloodthirst");
