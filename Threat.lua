@@ -3,7 +3,8 @@
   By: Ollowain.
   Modified for Turtle: allfox.
 	Credit: Fury.lua by Bhaerau.
-]]--
+]]
+--
 
 -- Variables
 local RevengeReadyUntil = 0;
@@ -17,7 +18,7 @@ local LastBattleShoutAttemptTime = 0;
 
 function Threat_Configuration_Init()
   if (not Threat_Configuration) then
-    Threat_Configuration = { };
+    Threat_Configuration = {};
   end
 
   if (Threat_Configuration["Debug"] == nil) then
@@ -150,7 +151,7 @@ end
 
 local function ShieldSlamLearned()
   if UnitClass("player") == "Warrior" then
-    local _, _, _, _, ss = GetTalentInfo(3,17);
+    local _, _, _, _, ss = GetTalentInfo(3, 17);
     if (ss >= 1) then
       return true;
     else
@@ -161,7 +162,7 @@ end
 
 local function BloodthirstLearned()
   if UnitClass("player") == "Warrior" then
-    local _, _, _, _, ss = GetTalentInfo(2,17);
+    local _, _, _, _, ss = GetTalentInfo(2, 17);
     if (ss >= 1) then
       return true;
     else
@@ -175,27 +176,27 @@ local function EquippedShield()
   -- Must do this SetOwner in this function, or tooltip would be blank
   ThreatTooltip:SetOwner(UIParent, "ANCHOR_NONE");
 
-  local hasItem, hasCooldown, repairCost = ThreatTooltip:SetInventoryItem("player", GetInventorySlotInfo("SecondaryHandSlot"));
+  local hasItem, hasCooldown, repairCost = ThreatTooltip:SetInventoryItem("player",
+    GetInventorySlotInfo("SecondaryHandSlot"));
   if not hasItem then
     return nil;
   end
 
   local lineCount = ThreatTooltip:NumLines();
   for i = 1, lineCount do
-    local leftText = getglobal("ThreatTooltipTextLeft"..i);
-    local itemType = getglobal("ThreatTooltipTextRight"..i);
+    local leftText = getglobal("ThreatTooltipTextLeft" .. i);
+    local itemType = getglobal("ThreatTooltipTextRight" .. i);
 
     -- Some item has attribute "Unique" which would append 1 line in front of the type line
     -- Check on left attribute to make sure we are looking into the type line
-    if(leftText:GetText() and 
-        (leftText:GetText() == ITEM_ATTRIBUTE_OFFHAND_THREAT or
-         leftText:GetText() == ITEM_ATTRIBUTE_MAINHAND_THREAT or
-         leftText:GetText() == ITEM_ATTRIBUTE_ONEHAND_THREAT or
-         leftText:GetText() == ITEM_ATTRIBUTE_TWOHAND_THREAT
-        )
-      ) then
-      
-      if(itemType:GetText() and itemType:GetText() == ITEM_TYPE_SHIELD_THREAT) then
+    if (leftText:GetText() and
+          (leftText:GetText() == ITEM_ATTRIBUTE_OFFHAND_THREAT or
+            leftText:GetText() == ITEM_ATTRIBUTE_MAINHAND_THREAT or
+            leftText:GetText() == ITEM_ATTRIBUTE_ONEHAND_THREAT or
+            leftText:GetText() == ITEM_ATTRIBUTE_TWOHAND_THREAT
+          )
+        ) then
+      if (itemType:GetText() and itemType:GetText() == ITEM_TYPE_SHIELD_THREAT) then
         return true;
       else
         -- Some item would bug on labels, showing past info instead of current.
@@ -210,7 +211,6 @@ end
 
 function Threat()
   if (not UnitIsCivilian("target") and UnitClass("player") == CLASS_WARRIOR_THREAT) then
-
     local rage = UnitMana("player");
     local hp = UnitHealth("player");
     local maxhp = UnitHealthMax("player");
@@ -219,13 +219,6 @@ function Threat()
       Debug("Starting AutoAttack");
       AttackTarget();
     end
-
---[[
-    if not IsCurrentAction(22) then
-      Debug("Starting AutoAttack");
-      UseAction(22);
-    end
-]]
 
     if (ActiveStance() ~= 2) then
       Debug("Changing to def stance");
@@ -252,31 +245,27 @@ function Threat()
         Debug("Battle Shout");
         LastBattleShoutAttemptTime = GetTime();
         CastSpellByName(ABILITY_BATTLE_SHOUT_THREAT);
+      elseif (SpellReady(ABILITY_SUNDER_ARMOR_THREAT) and
+            rage >= 20 and
+            not HasFiveSunderArmors("target")) then
+        Debug("Sunder Armor");
+        CastSpellByName(ABILITY_SUNDER_ARMOR_THREAT);
+        LastSunderArmorTime = GetTime();
       elseif (SpellReady(ABILITY_SHIELD_SLAM_THREAT) and rage >= 25 and ShieldSlamLearned()) then
         Debug("Shield slam");
         CastSpellByName(ABILITY_SHIELD_SLAM_THREAT);
       elseif (SpellReady(ABILITY_BLOODTHIRST_THREAT) and rage >= 35 and BloodthirstLearned()) then
         Debug("Bloodthirst");
         CastSpellByName(ABILITY_BLOODTHIRST_THREAT);
-      elseif (((BloodthirstLearned() and not SpellNearlyReady(ABILITY_BLOODTHIRST_THREAT)) or 
-                (ShieldSlamLearned() and not SpellNearlyReady(ABILITY_SHIELD_SLAM_THREAT)) or 
-                (not BloodthirstLearned() and not ShieldSlamLearned())) and 
-              UnitIsUnit("targettarget", "player") and 
-              SpellReady(ABILITY_SHIELD_BLOCK_THREAT) and 
-              EquippedShield() and rage >= 15 and 
-              (hp < maxhp)) then
+      elseif (((BloodthirstLearned() and not SpellNearlyReady(ABILITY_BLOODTHIRST_THREAT)) or
+              (ShieldSlamLearned() and not SpellNearlyReady(ABILITY_SHIELD_SLAM_THREAT)) or
+              (not BloodthirstLearned() and not ShieldSlamLearned())) and
+            UnitIsUnit("targettarget", "player") and
+            SpellReady(ABILITY_SHIELD_BLOCK_THREAT) and
+            EquippedShield() and rage >= 15 and
+            (hp < maxhp)) then
         Debug("Sheld Block normally");
         CastSpellByName(ABILITY_SHIELD_BLOCK_THREAT);
-      elseif (((BloodthirstLearned() and not SpellNearlyReady(ABILITY_BLOODTHIRST_THREAT)) or 
-                (ShieldSlamLearned() and not SpellNearlyReady(ABILITY_SHIELD_SLAM_THREAT)) or 
-                (ShieldSlamLearned() and not EquippedShield()) or 
-                (not BloodthirstLearned() and not ShieldSlamLearned())) and 
-              SpellReady(ABILITY_SUNDER_ARMOR_THREAT) and 
-              rage >= 20 and 
-              not HasFiveSunderArmors("target")) then
-        Debug("Sunder Armor");
-        CastSpellByName(ABILITY_SUNDER_ARMOR_THREAT);
-        LastSunderArmorTime = GetTime();
       elseif (SpellReady(ABILITY_HEROIC_STRIKE_THREAT) and rage >= 50) then
         Debug("Heroic strike");
         CastSpellByName(ABILITY_HEROIC_STRIKE_THREAT);
@@ -345,17 +334,15 @@ function Threat_OnEvent(event)
         SendChatMessage(MESSAGE_MOCKING_BLOW_MISS_THREAT);
       end
     end
-  elseif (event == "CHAT_MSG_COMBAT_CREATURE_VS_SELF_MISSES")then
+  elseif (event == "CHAT_MSG_COMBAT_CREATURE_VS_SELF_MISSES") then
     if string.find(arg1, EVENT_SELF_BLOCK_THREAT)
-    or string.find(arg1, EVENT_SELF_PARRY_THREAT)
-    or string.find(arg1, EVENT_SELF_DOGUE_THREAT) then
+        or string.find(arg1, EVENT_SELF_PARRY_THREAT)
+        or string.find(arg1, EVENT_SELF_DOGUE_THREAT) then
       Debug("Revenge soon ready");
       RevengeReadyUntil = GetTime() + 4;
     end
   end
 end
-
-
 
 function Threat_OnUpdate()
   if (ChallengingShoutBroadcasted and SpellNearlyReady(ABILITY_CHALLENGING_SHOUT_THREAT)) then
@@ -369,9 +356,8 @@ function Threat_OnUpdate()
   end
 
   if (ChallengingShoutCountdown >= 0 and (GetTime() - ChallengingLastBroadcastTime >= 1)) then
-    SendChatMessage(ChallengingShoutCountdown..MESSAGE_CHALLENGING_SHOUT_THREAT..ChallengingShoutCountdown);
+    SendChatMessage(ChallengingShoutCountdown .. MESSAGE_CHALLENGING_SHOUT_THREAT .. ChallengingShoutCountdown);
     ChallengingLastBroadcastTime = GetTime();
     ChallengingShoutCountdown = ChallengingShoutCountdown - 1;
   end
 end
-
