@@ -248,13 +248,13 @@ function Threat()
         Debug("First/Refresh Sunder armor");
         CastSpellByName(ABILITY_SUNDER_ARMOR_THREAT);
         LastSunderArmorTime = GetTime();
-      elseif (SpellReady(ABILITY_SHIELD_SLAM_THREAT) and rage >= 25 and ShieldSlamLearned()) then
-        Debug("Shield slam");
-        CastSpellByName(ABILITY_SHIELD_SLAM_THREAT);
       elseif (SpellReady(ABILITY_BATTLE_SHOUT_THREAT) and not HasBuff("player", "Ability_Warrior_BattleShout") and rage >= 15 and (GetTime() - LastBattleShoutAttemptTime > 3)) then
         Debug("Battle Shout");
         LastBattleShoutAttemptTime = GetTime();
         CastSpellByName(ABILITY_BATTLE_SHOUT_THREAT);
+      elseif (SpellReady(ABILITY_SHIELD_SLAM_THREAT) and rage >= 25 and ShieldSlamLearned()) then
+        Debug("Shield slam");
+        CastSpellByName(ABILITY_SHIELD_SLAM_THREAT);
       elseif (SpellReady(ABILITY_BLOODTHIRST_THREAT) and rage >= 35 and BloodthirstLearned()) then
         Debug("Bloodthirst");
         CastSpellByName(ABILITY_BLOODTHIRST_THREAT);
