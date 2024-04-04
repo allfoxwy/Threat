@@ -1,6 +1,6 @@
 # Threat
 
-A World of Warcraft Vanilla (v1.1.12) Addon to simplify Warrior tanking.
+Addon to simplify Warrior tanking for World of Warcraft Vanilla (v1.1.12).
 
 Providing warrior tank a single button solution to generate threat on a single target.
 
@@ -36,11 +36,11 @@ Bind the macro to a key and spam it to generate threat.
 
 ## Credit
 
-Original addon Threat (https://github.com/muellerj/Threat)
+Original addon: Threat (https://github.com/muellerj/Threat)
 
-Idea to check taunt resist is taken from Tank buddy (https://github.com/srazdokunebil/TankBuddy)
+Idea to check if taunt was resisted is taken from Tank buddy (https://github.com/srazdokunebil/TankBuddy)
 
-Idea to check if offhand holding a shield is tanken from Roid Macros (https://denniswg.github.io/Roid-Macros/)
+Idea to check if offhand is holding a shield is taken from Roid Macros (https://denniswg.github.io/Roid-Macros/)
 
 The original addon has not been updated for years. It only support Shield Slam so modern fury-protection tank can't use it.
 
