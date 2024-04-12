@@ -24,13 +24,13 @@ Bind the macro to a key and spam it to generate threat.
 ## Function description
 - Announce a message when Taunt resist or Mocking Blow missed
 - Announce a countdown when Challenging Shout
+- Revenge is used when possible
 - Prioritise Shield Block if HP less than 40%
 - Sunder Armor would be cast **once** on engage to generate initial threat to hold mobs away from healer
 - Buff self with Battle Shout
-- Revenge is used when possible
-- Apply Sunder Armor up to 5 stacks. No more than 5 stacks. Refresh after 25 seconds
-- Use Bloodthrist or Shield Slam after 5 Sunder Armor, according to talents
-- Use Shield Block when nothing else has priority
+- When HP less than 85%, use Shield Block if target enemy is targeting player.
+- Apply Sunder Armor up to 5 stacks. Refresh after 25 seconds
+- Use Bloodthrist or Shield Slam according to talents
 - Use Heroic Strike when rage overflow
 
 
