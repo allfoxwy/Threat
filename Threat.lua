@@ -108,7 +108,7 @@ local function ActiveStance()
 end
 
 
-function HasDisarm(unit)
+local function HasDisarm(unit)
     local id = 1;
     while (UnitDebuff(unit, id)) do
         local debuffTexture, debuffAmount = UnitDebuff(unit, id);
