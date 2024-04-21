@@ -303,6 +303,8 @@ function Threat_OnLoad()
 
     SlashCmdList["WARRTHREAT"] = Threat_SlashCommand;
     SLASH_WARRTHREAT1 = "/warrthreat";
+
+    Print("Threat addon loaded. Make a macro to call /warrthreat command to generate threat as lv60 Warrior.")
 end
 
 function Threat_OnEvent(event)
