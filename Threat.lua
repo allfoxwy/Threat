@@ -13,6 +13,10 @@ local ChallengingShoutCountdown = -1;
 local ChallengingLastBroadcastTime = 0;
 local LastSunderArmorTime = 0;
 local LastBattleShoutAttemptTime = 0;
+local LastDisarmAttemptTime = 0;
+
+-- Would be SavedVariables, not local
+Threat_KnownDisarmImmuneTable = nil;
 
 function Threat_Configuration_Init()
     if (not Threat_Configuration) then
@@ -107,7 +111,6 @@ local function ActiveStance()
     return nil;
 end
 
-
 local function HasDisarm(unit)
     local id = 1;
     while (UnitDebuff(unit, id)) do
@@ -122,6 +125,21 @@ local function HasDisarm(unit)
         id = id + 1;
     end
     return nil;
+end
+
+local function isKnownImmuneToDisarm(unit)
+    local target = UnitName(unit);
+    if(not target) then
+        return nil;
+    end
+
+    for i, v in pairs(Threat_KnownDisarmImmuneTable) do
+        if (target == v) then
+            return true;
+        end
+    end
+
+    return false;
 end
 
 local function HasOneSunderArmor(unit)
@@ -222,6 +240,12 @@ local function EquippedShield()
 end
 
 function Threat()
+
+    -- addon is not yet fully loaded
+    if(not Threat_KnownDisarmImmuneTable) then
+        return;
+    end
+
     if (not UnitIsCivilian("target") and UnitClass("player") == CLASS_WARRIOR_THREAT) then
         local rage = UnitMana("player");
         local hp = UnitHealth("player");
@@ -260,6 +284,13 @@ function Threat()
                 Debug("Battle Shout");
                 LastBattleShoutAttemptTime = GetTime();
                 CastSpellByName(ABILITY_BATTLE_SHOUT_THREAT);
+            elseif (not HasDisarm("target") and SpellReady(ABILITY_DISARM_THREAT) and rage >= 20 and
+                (GetTime() - LastDisarmAttemptTime > 3) and
+                (string.find(UnitClassification("target"), CLASSIFICATION_ELITE_THREAT) or
+                    string.find(UnitClassification("target"), CLASSIFICATION_WORLDBOSS_THREAT))) then
+                Debug("Disarm");
+                LastDisarmAttemptTime = GetTime();
+                CastSpellByName(ABILITY_DISARM_THREAT);
             elseif (UnitIsUnit("targettarget", "player") and SpellReady(ABILITY_SHIELD_BLOCK_THREAT) and
                 EquippedShield() and rage >= 15 and (hp / maxhp * 100) < 85) then
                 Debug("Sheld Block normally");
@@ -274,6 +305,7 @@ function Threat()
             elseif (SpellReady(ABILITY_BLOODTHIRST_THREAT) and rage >= 35 and BloodthirstLearned()) then
                 Debug("Bloodthirst");
                 CastSpellByName(ABILITY_BLOODTHIRST_THREAT);
+
             elseif (SpellReady(ABILITY_HEROIC_STRIKE_THREAT) and rage >= 55) then
                 Debug("Heroic strike");
                 CastSpellByName(ABILITY_HEROIC_STRIKE_THREAT);
@@ -307,7 +339,7 @@ end
 -- Event Handlers
 
 function Threat_OnLoad()
-    this:RegisterEvent("VARIABLES_LOADED");
+    this:RegisterEvent("ADDON_LOADED");
     this:RegisterEvent("PLAYER_ENTER_COMBAT");
     this:RegisterEvent("PLAYER_LEAVE_COMBAT");
     this:RegisterEvent("PLAYER_REGEN_DISABLED");
@@ -320,13 +352,17 @@ function Threat_OnLoad()
 
     SlashCmdList["WARRTHREAT"] = Threat_SlashCommand;
     SLASH_WARRTHREAT1 = "/warrthreat";
-
-    Print("Threat loaded. Make a macro to call /warrthreat command to generate threat as lv60 Warrior.");
 end
 
 function Threat_OnEvent(event)
-    if (event == "VARIABLES_LOADED") then
-        Threat_Configuration_Init()
+    if (event == "ADDON_LOADED" and arg1 == "Threat") then
+        Threat_Configuration_Init();
+
+        if(Threat_KnownDisarmImmuneTable == nil) then
+            Threat_KnownDisarmImmuneTable = {};
+        end
+
+        Print("Threat loaded. Make a macro to call \124cFFC69B6D/warrthreat\124r command to generate threat as lv60 Warrior.");
     elseif (event == "PLAYER_ENTER_COMBAT") then
         ThreatAttack = true;
     elseif (event == "PLAYER_LEAVE_COMBAT") then
@@ -336,6 +372,11 @@ function Threat_OnEvent(event)
     elseif (event == "PLAYER_REGEN_ENABLED") then
         InCombat = false;
     elseif (event == "CHAT_MSG_SPELL_SELF_DAMAGE") then
+        if (string.find(arg1, EVENT_CHECK_DISARM_FAILED_THREAT)) then
+            local _, _, mobName = string.find(arg1, EVENT_CHECK_DISARM_FAILED_THREAT);
+            table.insert(Threat_KnownDisarmImmuneTable, mobName);
+        end
+
         -- These resist check is taken from TankBuddy (https://github.com/srazdokunebil/TankBuddy/blob/main/TankBuddy.lua)
         if (string.find(arg1, EVENT_CHECK_TAUNT_RESIST_THREAT)) then
             SendChatMessage(MESSAGE_TAUNT_RESIST_THREAT);

@@ -10,6 +10,9 @@ BINDING_HEADER_THREAT             = "Threat";
 
 CLASS_WARRIOR_THREAT              = "Warrior";
 
+CLASSIFICATION_ELITE_THREAT       = "elite";
+CLASSIFICATION_WORLDBOSS_THREAT   = "boss";
+
 ABILITY_BATTLE_SHOUT_THREAT       = "Battle Shout";
 ABILITY_BATTLE_STANCE_THREAT      = "Battle Stance";
 ABILITY_BERSERKER_RAGE_THREAT     = "Berserker Rage";
@@ -56,6 +59,7 @@ EVENT_SELF_DOGUE_THREAT       = "You dodge";
 EVENT_SELF_PARRY_THREAT       = "You parry";
 EVENT_SELF_BLOCK_THREAT       = "You block";
 EVENT_CHECK_TAUNT_RESIST_THREAT   = "Your Taunt was resisted by (%w+)";
+EVENT_CHECK_DISARM_FAILED_THREAT  = "Your Disarm failed\. (.+) is immune";
 EVENT_FIRE_MOCKING_BLOW_THREAT    = "(.*)Mocking Blow(.*)";
 EVENT_HIT_MOCKING_BLOW_THREAT     = "Your Mocking Blow (.+) for (.+)";
 

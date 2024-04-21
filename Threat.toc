@@ -4,4 +4,5 @@
 ## Author: Ollowain, allfox
 ## DefaultState: enabled
 ## OptionalDeps: none
+## SavedVariables: Threat_KnownDisarmImmuneTable
 Threat.xml
