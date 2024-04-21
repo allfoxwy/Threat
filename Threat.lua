@@ -107,11 +107,28 @@ local function ActiveStance()
     return nil;
 end
 
+
+function HasDisarm(unit)
+    local id = 1;
+    while (UnitDebuff(unit, id)) do
+        local debuffTexture, debuffAmount = UnitDebuff(unit, id);
+        if (string.find(debuffTexture, DEBUFF_DISARM_THREAT)) then
+            if (debuffAmount >= 1) then
+                return true;
+            else
+                return nil;
+            end
+        end
+        id = id + 1;
+    end
+    return nil;
+end
+
 local function HasOneSunderArmor(unit)
     local id = 1;
     while (UnitDebuff(unit, id)) do
         local debuffTexture, debuffAmount = UnitDebuff(unit, id);
-        if (string.find(debuffTexture, "Sunder")) then
+        if (string.find(debuffTexture, DEBUFF_SUNDER_ARMOR_THREAT)) then
             if (debuffAmount >= 1) then
                 return true;
             else
@@ -127,7 +144,7 @@ local function HasFiveSunderArmors(unit)
     local id = 1;
     while (UnitDebuff(unit, id)) do
         local debuffTexture, debuffAmount = UnitDebuff(unit, id);
-        if (string.find(debuffTexture, "Sunder")) then
+        if (string.find(debuffTexture, DEBUFF_SUNDER_ARMOR_THREAT)) then
             if (debuffAmount >= 5) then
                 return true;
             else
@@ -148,7 +165,7 @@ local function RevengeAvail()
 end
 
 local function ShieldSlamLearned()
-    if UnitClass("player") == "Warrior" then
+    if UnitClass("player") == CLASS_WARRIOR_THREAT then
         local _, _, _, _, ss = GetTalentInfo(3, 17);
         if (ss >= 1) then
             return true;
@@ -159,7 +176,7 @@ local function ShieldSlamLearned()
 end
 
 local function BloodthirstLearned()
-    if UnitClass("player") == "Warrior" then
+    if UnitClass("player") == CLASS_WARRIOR_THREAT then
         local _, _, _, _, ss = GetTalentInfo(2, 17);
         if (ss >= 1) then
             return true;
