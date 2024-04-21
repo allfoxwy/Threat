@@ -237,7 +237,7 @@ end
 function Threat()
 
     -- addon is not yet fully loaded
-    if(not Threat_KnownDisarmImmuneTable) then
+    if (not Threat_KnownDisarmImmuneTable) then
         return;
     end
 
@@ -282,7 +282,8 @@ function Threat()
             elseif (not HasDisarm("target") and SpellReady(ABILITY_DISARM_THREAT) and rage >= 20 and
                 (GetTime() - LastDisarmAttemptTime > 3) and
                 (string.find(UnitClassification("target"), CLASSIFICATION_ELITE_THREAT) or
-                    string.find(UnitClassification("target"), CLASSIFICATION_WORLDBOSS_THREAT))) then
+                    string.find(UnitClassification("target"), CLASSIFICATION_WORLDBOSS_THREAT)) and
+                not isKnownImmuneToDisarm(UnitName("target"))) then
                 Debug("Disarm");
                 LastDisarmAttemptTime = GetTime();
                 CastSpellByName(ABILITY_DISARM_THREAT);
@@ -353,11 +354,12 @@ function Threat_OnEvent(event)
     if (event == "ADDON_LOADED" and arg1 == "Threat") then
         Threat_Configuration_Init();
 
-        if(Threat_KnownDisarmImmuneTable == nil) then
+        if (Threat_KnownDisarmImmuneTable == nil) then
             Threat_KnownDisarmImmuneTable = {};
         end
 
-        Print("Threat loaded. Make a macro to call \124cFFC69B6D/warrthreat\124r command to generate threat as lv60 Warrior.");
+        Print(
+            "Threat loaded. Make a macro to call \124cFFC69B6D/warrthreat\124r command to generate threat as lv60 Warrior.");
     elseif (event == "PLAYER_ENTER_COMBAT") then
         ThreatAttack = true;
     elseif (event == "PLAYER_LEAVE_COMBAT") then
@@ -370,7 +372,7 @@ function Threat_OnEvent(event)
         if (string.find(arg1, EVENT_CHECK_DISARM_FAILED_THREAT)) then
             local _, _, mobName = string.find(arg1, EVENT_CHECK_DISARM_FAILED_THREAT);
 
-            if(mobName and not isKnownImmuneToDisarm(mobName)) then
+            if (mobName and not isKnownImmuneToDisarm(mobName)) then
                 table.insert(Threat_KnownDisarmImmuneTable, mobName);
             end
         end

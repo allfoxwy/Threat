@@ -11,14 +11,14 @@ Built on Turtle WoW server.
 
 Clone the repository into your `Addons` folder:
 
-    cd <WOW_BASE_DIR>/Interface/Addons
+    cd <WoW_game_folder>/Interface/Addons
     git clone --depth=1 https://github.com/allfoxwy/Threat.git
 
 Create a macro to call `/warrthreat`:
 
     /warrthreat
 
-Bind the macro to a key and spam it to generate threat.
+Bind the macro to a key and repeatly press it to generate threat.
 
 
 ## Function description
@@ -28,10 +28,19 @@ Bind the macro to a key and spam it to generate threat.
 - Prioritise Shield Block if HP less than 40%
 - Sunder Armor would be cast **once** on engage to generate initial threat to hold mobs away from healer
 - Buff self with Battle Shout
+- Attempt to Disarm Elite or World Boss. However if the attempt failed because of immune, this event would be recorded and would not attempt again.
 - When HP less than 85%, use Shield Block if target enemy is targeting player.
 - Apply Sunder Armor up to 5 stacks. Refresh after 25 seconds
 - Use Bloodthrist or Shield Slam according to talents
 - Use Heroic Strike when rage overflow
+
+
+## Reset known Disarm immune table
+Like all WoW addon, it is saved in WTF folder:
+
+    <WoW_game_folder>/WTF/Account/<Your_account_name>/SavedVariables/Threat.lua
+
+In case you need reset the table, you could delete the file.
 
 
 ## Credit
