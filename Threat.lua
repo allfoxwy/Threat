@@ -1,6 +1,6 @@
 --[[
   Threat
-  By: Ollowain.
+  Origin By: Ollowain.
   Modified for Turtle: allfox.
 	Credit: Fury.lua by Bhaerau.
 ]] --
@@ -14,6 +14,8 @@ local ChallengingLastBroadcastTime = 0;
 local LastSunderArmorTime = 0;
 local LastBattleShoutAttemptTime = 0;
 local LastDisarmAttemptTime = 0;
+local ShieldWallBroadcasted = true;
+local LastStandBroadcasted = true;
 
 -- Would be SavedVariables, not local
 Threat_KnownDisarmImmuneTable = nil;
@@ -343,9 +345,6 @@ function Threat_OnLoad()
     this:RegisterEvent("CHAT_MSG_COMBAT_CREATURE_VS_SELF_MISSES");
     this:RegisterEvent("CHAT_MSG_SPELL_SELF_DAMAGE");
 
-    ThreatLastSpellCast = GetTime();
-    ChallengingShoutBroadcasted = not SpellReady(ABILITY_CHALLENGING_SHOUT_THREAT);
-
     SlashCmdList["WARRTHREAT"] = Threat_SlashCommand;
     SLASH_WARRTHREAT1 = "/warrthreat";
 end
@@ -357,6 +356,11 @@ function Threat_OnEvent(event)
         if (Threat_KnownDisarmImmuneTable == nil) then
             Threat_KnownDisarmImmuneTable = {};
         end
+
+        ThreatLastSpellCast = GetTime();
+        ChallengingShoutBroadcasted = not SpellReady(ABILITY_CHALLENGING_SHOUT_THREAT);
+        LastStandBroadcasted = not SpellReady(ABILITY_LAST_STAND_THREAT);
+        ShieldWallBroadcasted = not SpellReady(ABILITY_SHIELD_WALL_THREAT);
 
         Print(
             "Threat loaded. Make a macro to call \124cFFC69B6D/warrthreat\124r command to generate threat as lv60 Warrior.");
@@ -395,6 +399,11 @@ function Threat_OnEvent(event)
 end
 
 function Threat_OnUpdate()
+    -- addon is not yet fully loaded
+    if (not Threat_KnownDisarmImmuneTable) then
+        return;
+    end
+
     if (ChallengingShoutBroadcasted and SpellNearlyReady(ABILITY_CHALLENGING_SHOUT_THREAT)) then
         ChallengingShoutBroadcasted = false;
     elseif (not ChallengingShoutBroadcasted and not SpellNearlyReady(ABILITY_CHALLENGING_SHOUT_THREAT)) then
@@ -409,5 +418,19 @@ function Threat_OnUpdate()
         SendChatMessage(ChallengingShoutCountdown .. MESSAGE_CHALLENGING_SHOUT_THREAT .. ChallengingShoutCountdown);
         ChallengingLastBroadcastTime = GetTime();
         ChallengingShoutCountdown = ChallengingShoutCountdown - 1;
+    end
+
+    if (ShieldWallBroadcasted and SpellNearlyReady(ABILITY_SHIELD_WALL_THREAT)) then
+        ShieldWallBroadcasted = false;
+    elseif (not ShieldWallBroadcasted and not SpellNearlyReady(ABILITY_SHIELD_WALL_THREAT)) then
+        ShieldWallBroadcasted = true;
+        SendChatMessage(MESSAGE_SHIELD_WALL_THREAT);
+    end
+
+    if (LastStandBroadcasted and SpellNearlyReady(ABILITY_LAST_STAND_THREAT)) then
+        LastStandBroadcasted = false;
+    elseif (not LastStandBroadcasted and not SpellNearlyReady(ABILITY_LAST_STAND_THREAT)) then
+        LastStandBroadcasted = true;
+        SendChatMessage(MESSAGE_LAST_STAND_THREAT);
     end
 end

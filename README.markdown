@@ -1,6 +1,6 @@
 # Threat
 
-Addon to simplify Warrior tanking for World of Warcraft Vanilla (v1.1.12).
+Addon to simplify Warrior tanking for World of Warcraft Vanilla (v1.12).
 
 Providing warrior tank a single button solution to generate threat on a single target.
 
@@ -23,6 +23,7 @@ Bind the macro to a key and repeatly press it to generate threat.
 
 ## Function description
 - Announce a message when Taunt resist or Mocking Blow missed
+- Announce a message when Shield Wall or Last Stand
 - Announce a countdown when Challenging Shout
 - Revenge is used when possible
 - Prioritise Shield Block if HP less than 40%
