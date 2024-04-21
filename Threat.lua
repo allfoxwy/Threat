@@ -127,14 +127,9 @@ local function HasDisarm(unit)
     return nil;
 end
 
-local function isKnownImmuneToDisarm(unit)
-    local target = UnitName(unit);
-    if(not target) then
-        return nil;
-    end
-
+local function isKnownImmuneToDisarm(mobName)
     for i, v in pairs(Threat_KnownDisarmImmuneTable) do
-        if (target == v) then
+        if (mobName == v) then
             return true;
         end
     end
@@ -374,7 +369,10 @@ function Threat_OnEvent(event)
     elseif (event == "CHAT_MSG_SPELL_SELF_DAMAGE") then
         if (string.find(arg1, EVENT_CHECK_DISARM_FAILED_THREAT)) then
             local _, _, mobName = string.find(arg1, EVENT_CHECK_DISARM_FAILED_THREAT);
-            table.insert(Threat_KnownDisarmImmuneTable, mobName);
+
+            if(mobName and not isKnownImmuneToDisarm(mobName)) then
+                table.insert(Threat_KnownDisarmImmuneTable, mobName);
+            end
         end
 
         -- These resist check is taken from TankBuddy (https://github.com/srazdokunebil/TankBuddy/blob/main/TankBuddy.lua)
