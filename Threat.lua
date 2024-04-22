@@ -201,12 +201,14 @@ local function BloodthirstLearned()
     end
 end
 
--- return how many level of Improved Shield Wall talent has been learnt
-local function ImprovedSheildWallLevel()
+-- return how many time increasement of Improved Shield Wall talent has been learnt
+function ImprovedSheildWallIncrasedTime()
     if UnitClass("player") == CLASS_WARRIOR_THREAT then
         local _, _, _, _, ss = GetTalentInfo(3, 13);
-        if (ss >= 1) then
-            return ss;
+        if (ss == 1) then
+            return 3;
+        elseif (ss == 2) then
+            return 5;
         else
             return 0;
         end
@@ -317,7 +319,8 @@ function Threat()
                 EquippedShield() and rage >= 15 and (hp / maxhp * 100) < 85) then
                 Debug("Sheld Block normally");
                 CastSpellByName(ABILITY_SHIELD_BLOCK_THREAT);
-            elseif (SpellReady(ABILITY_SUNDER_ARMOR_THREAT) and rage >= (20 - ImprovedSunderArmorLevel()) and not HasFiveSunderArmors("target")) then
+            elseif (SpellReady(ABILITY_SUNDER_ARMOR_THREAT) and rage >= (20 - ImprovedSunderArmorLevel()) and
+                not HasFiveSunderArmors("target")) then
                 Debug("Sunder Armor");
                 CastSpellByName(ABILITY_SUNDER_ARMOR_THREAT);
                 LastSunderArmorTime = GetTime();
