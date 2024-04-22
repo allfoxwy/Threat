@@ -202,7 +202,7 @@ local function BloodthirstLearned()
 end
 
 -- return how many time increasement of Improved Shield Wall talent has been learnt
-function ImprovedSheildWallIncrasedTime()
+local function ImprovedSheildWallIncrasedTime()
     if UnitClass("player") == CLASS_WARRIOR_THREAT then
         local _, _, _, _, ss = GetTalentInfo(3, 13);
         if (ss == 1) then
