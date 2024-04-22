@@ -295,7 +295,7 @@ function Threat()
                 SpellReady(ABILITY_SHIELD_BLOCK_THREAT)) then
                 Debug("Sheld Block when HP < 40");
                 CastSpellByName(ABILITY_SHIELD_BLOCK_THREAT);
-            elseif (SpellReady(ABILITY_SUNDER_ARMOR_THREAT) and rage >= 15 and
+            elseif (SpellReady(ABILITY_SUNDER_ARMOR_THREAT) and rage >= (15 - ImprovedSunderArmorLevel()) and
                 (not HasOneSunderArmor("target") or LastSunderArmorTime + 25 <= GetTime())) then
                 Debug("First/Refresh Sunder armor");
                 CastSpellByName(ABILITY_SUNDER_ARMOR_THREAT);
@@ -317,7 +317,7 @@ function Threat()
                 EquippedShield() and rage >= 15 and (hp / maxhp * 100) < 85) then
                 Debug("Sheld Block normally");
                 CastSpellByName(ABILITY_SHIELD_BLOCK_THREAT);
-            elseif (SpellReady(ABILITY_SUNDER_ARMOR_THREAT) and rage >= 20 and not HasFiveSunderArmors("target")) then
+            elseif (SpellReady(ABILITY_SUNDER_ARMOR_THREAT) and rage >= (20 - ImprovedSunderArmorLevel()) and not HasFiveSunderArmors("target")) then
                 Debug("Sunder Armor");
                 CastSpellByName(ABILITY_SUNDER_ARMOR_THREAT);
                 LastSunderArmorTime = GetTime();
