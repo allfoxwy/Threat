@@ -15,7 +15,9 @@ local LastSunderArmorTime = 0;
 local LastBattleShoutAttemptTime = 0;
 local LastDisarmAttemptTime = 0;
 local ShieldWallBroadcasted = true;
+local ShieldWallEnding = -1;
 local LastStandBroadcasted = true;
+local LastStandEnding = -1;
 
 -- Would be SavedVariables, not local
 Threat_KnownDisarmImmuneTable = nil;
@@ -452,6 +454,14 @@ function Threat_OnUpdate()
     elseif (not ShieldWallBroadcasted and not SpellNearlyReady(ABILITY_SHIELD_WALL_THREAT)) then
         ShieldWallBroadcasted = true;
         SendChatMessage(MESSAGE_SHIELD_WALL_THREAT);
+
+        -- Announcement would be 3 sec earlier, while it says -4 because GetTime() has a precision of 1 sec so in worst case we need a -4
+        ShieldWallEnding = GetTime() + 10 + ImprovedSheildWallIncrasedTime() - 4;
+    end
+
+    if (ShieldWallEnding > 0 and (GetTime() >= ShieldWallEnding)) then
+        ShieldWallEnding = -1;
+        SendChatMessage(MESSAGE_SHIELD_WALL_ENDING_THREAT);
     end
 
     if (LastStandBroadcasted and SpellNearlyReady(ABILITY_LAST_STAND_THREAT)) then
@@ -459,5 +469,13 @@ function Threat_OnUpdate()
     elseif (not LastStandBroadcasted and not SpellNearlyReady(ABILITY_LAST_STAND_THREAT)) then
         LastStandBroadcasted = true;
         SendChatMessage(MESSAGE_LAST_STAND_THREAT);
+
+        -- Announcement would be 3 sec earlier, while it says -4 because GetTime() has a precision of 1 sec so in worst case we need a -4
+        LastStandEnding = GetTime() + 20 - 4;
+    end
+
+    if (LastStandEnding > 0 and (GetTime() >= LastStandEnding)) then
+        LastStandEnding = -1;
+        SendChatMessage(MESSAGE_LAST_STAND_ENDING_THREAT);
     end
 end

@@ -55,7 +55,9 @@ MESSAGE_TAUNT_RESIST_THREAT       = "Taunt RESISTED";
 MESSAGE_MOCKING_BLOW_MISS_THREAT  = "Mocking Blow MISSED";
 MESSAGE_CHALLENGING_SHOUT_THREAT  = "  Challenging Shout ends in ";
 MESSAGE_SHIELD_WALL_THREAT        = "Shield Wall activated";
+MESSAGE_SHIELD_WALL_ENDING_THREAT = "Shield Wall is ending";
 MESSAGE_LAST_STAND_THREAT         = "Last Stand activated";
+MESSAGE_LAST_STAND_ENDING_THREAT  = "Last Stand is ending";
 
 EVENT_SELF_DOGUE_THREAT       = "You dodge";
 EVENT_SELF_PARRY_THREAT       = "You parry";
