@@ -201,6 +201,30 @@ local function BloodthirstLearned()
     end
 end
 
+-- return how many level of Improved Shield Wall talent has been learnt
+local function ImprovedSheildWallLevel()
+    if UnitClass("player") == CLASS_WARRIOR_THREAT then
+        local _, _, _, _, ss = GetTalentInfo(3, 13);
+        if (ss >= 1) then
+            return ss;
+        else
+            return 0;
+        end
+    end
+end
+
+-- return how many level of Improved Sunder Armor talent has been learnt
+local function ImprovedSunderArmorLevel()
+    if UnitClass("player") == CLASS_WARRIOR_THREAT then
+        local _, _, _, _, ss = GetTalentInfo(3, 10);
+        if (ss >= 1) then
+            return ss;
+        else
+            return 0;
+        end
+    end
+end
+
 local function EquippedShield()
     -- The idea of using tooltip to decide if offhand has a shiled is taken from Roid Macros (https://denniswg.github.io/Roid-Macros/)
     -- Must do this SetOwner in this function, or tooltip would be blank
