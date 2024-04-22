@@ -455,8 +455,8 @@ function Threat_OnUpdate()
         ShieldWallBroadcasted = true;
         SendChatMessage(MESSAGE_SHIELD_WALL_THREAT);
 
-        -- Announcement would be 3 sec earlier, while it says -4 because GetTime() has a precision of 1 sec so in worst case we need a -4
-        ShieldWallEnding = GetTime() + 10 + ImprovedSheildWallIncrasedTime() - 4;
+        -- Announcement would be 3 sec earlier
+        ShieldWallEnding = GetTime() + 10 + ImprovedSheildWallIncrasedTime() - 3;
     end
 
     if (ShieldWallEnding > 0 and (GetTime() >= ShieldWallEnding)) then
@@ -470,8 +470,8 @@ function Threat_OnUpdate()
         LastStandBroadcasted = true;
         SendChatMessage(MESSAGE_LAST_STAND_THREAT);
 
-        -- Announcement would be 3 sec earlier, while it says -4 because GetTime() has a precision of 1 sec so in worst case we need a -4
-        LastStandEnding = GetTime() + 20 - 4;
+        -- Announcement would be 3 sec earlier
+        LastStandEnding = GetTime() + 20 - 3;
     end
 
     if (LastStandEnding > 0 and (GetTime() >= LastStandEnding)) then
