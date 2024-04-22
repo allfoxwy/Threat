@@ -23,7 +23,7 @@ Bind the macro to a key and repeatly press it to generate threat.
 
 ## Function description
 - Announce a message when Taunt resist or Mocking Blow missed
-- Announce a message when Shield Wall or Last Stand
+- Announce a message when Shield Wall or Last Stand, and another message 3 sec before they ends.
 - Announce a countdown when Challenging Shout
 - Revenge is used when possible
 - Prioritise Shield Block if HP less than 40%
