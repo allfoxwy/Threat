@@ -392,7 +392,7 @@ function Threat_OnEvent(event)
         ShieldWallBroadcasted = not SpellReady(ABILITY_SHIELD_WALL_THREAT);
 
         Print(
-            "Threat loaded. Make a macro to call \124cFFC69B6D/warrthreat\124r command to generate threat as lv60 Warrior.");
+            "Threat loaded. Make a macro to call \124cFFC69B6D/warrthreat\124r command to perform tanking rotation as lv60 Warrior.");
     elseif (event == "PLAYER_ENTER_COMBAT") then
         ThreatAttack = true;
     elseif (event == "PLAYER_LEAVE_COMBAT") then
