@@ -449,13 +449,13 @@ function Threat_OnUpdate()
         ChallengingShoutCountdown = ChallengingShoutCountdown - 1;
     end
 
-    if (ShieldWallBroadcasted and SpellNearlyReady(ABILITY_SHIELD_WALL_THREAT)) then
+    if (ShieldWallBroadcasted and not HasBuff("player", "Ability_Warrior_ShieldWall")) then
         ShieldWallBroadcasted = false;
-    elseif (not ShieldWallBroadcasted and not SpellNearlyReady(ABILITY_SHIELD_WALL_THREAT)) then
+    elseif (not ShieldWallBroadcasted and HasBuff("player", "Ability_Warrior_ShieldWall")) then
         ShieldWallBroadcasted = true;
         SendChatMessage(MESSAGE_SHIELD_WALL_THREAT);
 
-        -- Announcement would be 3 sec earlier
+        -- Ending announcement would be 3 sec earlier
         ShieldWallEnding = GetTime() + 10 + ImprovedSheildWallIncrasedTime() - 3;
     end
 
@@ -470,7 +470,7 @@ function Threat_OnUpdate()
         LastStandBroadcasted = true;
         SendChatMessage(MESSAGE_LAST_STAND_THREAT);
 
-        -- Announcement would be 3 sec earlier
+        -- Ending announcement would be 3 sec earlier
         LastStandEnding = GetTime() + 20 - 3;
     end
 
