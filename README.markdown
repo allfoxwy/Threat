@@ -36,7 +36,7 @@ Built on Turtle WoW server. If you have issue report you could reply to this thr
 
 ## Edit message words
 All `say` messages are saved in Localization.lua:
-    <WoW_game_folder>/Interface/AddOns/Threat/Localization.lua
+> <WoW_game_folder>/Interface/AddOns/Threat/Localization.lua
 
 You could edit MESSAGE_ strings in it. Keep it English only as server might refuse non-English words.
 
@@ -44,7 +44,7 @@ You could edit MESSAGE_ strings in it. Keep it English only as server might refu
 While it's a rare situation, server update might require a reset on locally-saved known Disarm immune table.
 
 Like all WoW addon, it is saved in WTF folder:
-    <WoW_game_folder>/WTF/Account/<Your_account_name>/SavedVariables/Threat.lua
+> <WoW_game_folder>/WTF/Account/<Your_account_name>/SavedVariables/Threat.lua
 
 To reset the table, you could delete the file.
 
