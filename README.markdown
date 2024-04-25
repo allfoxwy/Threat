@@ -1,24 +1,21 @@
 # Threat
 
-Addon to simplify Warrior tanking for World of Warcraft Vanilla (v1.12).
-
-Providing warrior tank a single button solution to generate threat on a single target.
+Addon for Warrior tank in World of Warcraft Vanilla (v1.12):
+1. Announce messages to `say` channel for important tank events
+1. Providing a new slash command which would help tanking skill rotation
 
 Built on Turtle WoW server. If you have issue report you could reply to this thread: https://forum.turtle-wow.org/viewtopic.php?t=13085
 
 
 ## Installation
 
-Clone the repository into your `Addons` folder:
+1. Download ZIP or clone the repository into your `Addons` folder.
 
-    cd <WoW_game_folder>/Interface/Addons
-    git clone --depth=1 https://github.com/allfoxwy/Threat.git
+1. Announcing function would be triggered by certain game events. No need to setup anything.
 
-Create a macro to call `/warrthreat`:
+1. Tanking rotation could be done by calling `/warrthreat` slash command. Each time it is called it would try perform 1 action in the rotation. Recommended usage is to make a macro with a single line `/warrthreat`, then bind the macro to a key and repeatly press it during engage.
 
-    /warrthreat
-
-Bind the macro to a key and repeatly press it to generate threat.
+1. In case you perfer doing rotation yourself but would like to have announcements, you could ignore the slash command not using it at all. Announcements still work.
 
 
 ## Function description
@@ -34,14 +31,22 @@ Bind the macro to a key and repeatly press it to generate threat.
 - Apply Sunder Armor up to 5 stacks. Refresh after 25 seconds
 - Use Bloodthrist or Shield Slam according to talents
 - Use Heroic Strike when rage overflow
+    - If you don't have a shield in offhand, certain action would be skipped. Sure you could switch shield on during combat and call the rotation again.
+    - Battle Shout might fail due to silence but you could keep call the rotation. It would be retried later.
 
+## Edit message words
+All `say` messages are saved in Localization.lua:
+    <WoW_game_folder>/Interface/AddOns/Threat/Localization.lua
+
+You could edit MESSAGE_ strings in it. Keep it English only as server might refuse non-English words.
 
 ## Reset known Disarm immune table
-Like all WoW addon, it is saved in WTF folder:
+While it's a rare situation, server update might require a reset on locally-saved known Disarm immune table.
 
+Like all WoW addon, it is saved in WTF folder:
     <WoW_game_folder>/WTF/Account/<Your_account_name>/SavedVariables/Threat.lua
 
-In case you need reset the table, you could delete the file.
+To reset the table, you could delete the file.
 
 
 ## Credit
