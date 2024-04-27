@@ -412,10 +412,47 @@ function Threat_OnEvent(event)
 
         -- These resist check is taken from TankBuddy (https://github.com/srazdokunebil/TankBuddy/blob/main/TankBuddy.lua)
         if (string.find(arg1, EVENT_CHECK_TAUNT_RESIST_THREAT)) then
-            SendChatMessage(MESSAGE_TAUNT_RESIST_THREAT);
+            local _, _, mobName = string.find(arg1, EVENT_CHECK_TAUNT_RESIST_THREAT);
+
+            local tauntMessage = "";
+
+            if (mobName) then
+                mobName = string.format("%s%s", MESSAGE_BY_THREAT, mobName);
+
+            else
+                mobName = "";
+            end
+
+            tauntMessage = string.format(MESSAGE_TAUNT_RESIST_THREAT, mobName);
+            SendChatMessage(tauntMessage);
+
         elseif (string.find(arg1, EVENT_FIRE_MOCKING_BLOW_THREAT)) then
             if (not string.find(arg1, EVENT_HIT_MOCKING_BLOW_THREAT)) then
-                SendChatMessage(MESSAGE_MOCKING_BLOW_MISS_THREAT);
+                local _, _, reason, mobName = string.find(arg1, EVENT_FAILED_MOCKING_BLOW_THREAT);
+
+                if (reason) then
+                    reason = string.upper(reason);
+                else
+                    reason = "MISSED";
+                end
+                if (mobName) then
+                    mobName = string.format("%s%s", MESSAGE_BY_THREAT, mobName);
+                else
+                    local _, _, mobName2 = string.find(arg1, EVENT_MISSED_MOCKING_BLOW_THREAT);
+
+                    -- Because the local keyword would limit scope, while _ and mobName in different scope
+                    mobName = mobName2;
+
+                    if (mobName) then
+                        mobName = string.format(" %s", mobName);
+                    else
+                        mobName = "";
+                    end
+                end
+
+                local mockingBlowMessage = string.format(MESSAGE_MOCKING_BLOW_MISS_THREAT, reason, mobName);
+                SendChatMessage(mockingBlowMessage);
+
             end
         end
     elseif (event == "CHAT_MSG_COMBAT_CREATURE_VS_SELF_MISSES") then
