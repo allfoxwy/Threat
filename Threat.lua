@@ -416,16 +416,11 @@ function Threat_OnEvent(event)
         if (string.find(arg1, EVENT_CHECK_TAUNT_RESIST_THREAT)) then
             local _, _, mobName = string.find(arg1, EVENT_CHECK_TAUNT_RESIST_THREAT);
 
-            local tauntMessage = "";
-
-            if (mobName) then
-                mobName = string.format("%s%s", MESSAGE_BY_THREAT, mobName);
-
-            else
+            if (not mobName) then
                 mobName = "";
             end
 
-            tauntMessage = string.format(MESSAGE_TAUNT_RESIST_THREAT, mobName);
+            local tauntMessage = string.gsub(MESSAGE_TAUNT_RESIST_THREAT, "$mob_name", mobName);
             SendChatMessage(tauntMessage);
 
         elseif (string.find(arg1, EVENT_FIRE_MOCKING_BLOW_THREAT)) then
@@ -433,26 +428,24 @@ function Threat_OnEvent(event)
                 local _, _, reason, mobName = string.find(arg1, EVENT_FAILED_MOCKING_BLOW_THREAT);
 
                 if (reason) then
-                    reason = string.upper(reason);
+                    reason = string.upper(reason).." "..MESSAGE_BY_THREAT;
                 else
-                    reason = "MISSED";
+                    reason = MESSAGE_MISSED_THREAT;
                 end
-                if (mobName) then
-                    mobName = string.format("%s%s", MESSAGE_BY_THREAT, mobName);
-                else
+
+                if (not mobName) then
                     local _, _, mobName2 = string.find(arg1, EVENT_MISSED_MOCKING_BLOW_THREAT);
 
-                    -- Because the local keyword would limit scope, while _ and mobName in different scope
+                    -- Because the local keyword limits scope, while _ and mobName in different scope
                     mobName = mobName2;
 
-                    if (mobName) then
-                        mobName = string.format(" %s", mobName);
-                    else
+                    if (not mobName) then
                         mobName = "";
                     end
                 end
 
-                local mockingBlowMessage = string.format(MESSAGE_MOCKING_BLOW_MISS_THREAT, reason, mobName);
+                local mockingBlowMessage = string.gsub(MESSAGE_MOCKING_BLOW_FAILED_THREAT, "$reason", reason);
+                mockingBlowMessage = string.gsub(mockingBlowMessage, "$mob_name", mobName);
                 SendChatMessage(mockingBlowMessage);
 
             end

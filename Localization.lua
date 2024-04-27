@@ -51,9 +51,10 @@ ITEM_ATTRIBUTE_MAINHAND_THREAT    = "Main Hand";
 ITEM_ATTRIBUTE_ONEHAND_THREAT     = "One-Hand";
 ITEM_ATTRIBUTE_TWOHAND_THREAT     = "Two-Hand";
 
-MESSAGE_TAUNT_RESIST_THREAT       = "Taunt RESISTED%s";
-MESSAGE_MOCKING_BLOW_MISS_THREAT  = "Mocking Blow %s%s";
-MESSAGE_BY_THREAT                 = " by ";
+MESSAGE_TAUNT_RESIST_THREAT       = "Taunt RESISTED by $mob_name";
+MESSAGE_MOCKING_BLOW_FAILED_THREAT  = "Mocking Blow $reason $mob_name";
+MESSAGE_BY_THREAT                 = "by";
+MESSAGE_MISSED_THREAT             = "MISSED";
 MESSAGE_CHALLENGING_SHOUT_THREAT  = "  Challenging Shout ends in ";
 MESSAGE_SHIELD_WALL_THREAT        = "Shield Wall activated";
 MESSAGE_SHIELD_WALL_ENDING_THREAT = "Shield Wall is ending";
