@@ -465,7 +465,7 @@ function Threat_OnUpdate()
         return;
     end
 
-    -- Limit frequency to 25Hz. Maybe, might some slower computer need it
+    -- Limit frequency to 25Hz. Slow computer might need it
     if (GetTime() < LastOnUpdateTime + (1 / 25)) then
         return;
     else
