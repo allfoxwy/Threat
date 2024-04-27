@@ -14,6 +14,7 @@ local ChallengingLastBroadcastTime = 0;
 local LastSunderArmorTime = 0;
 local LastBattleShoutAttemptTime = 0;
 local LastDisarmAttemptTime = 0;
+local LastOnUpdateTime = 0;
 local ShieldWallBroadcasted = true;
 local ShieldWallEnding = -1;
 local LastStandBroadcasted = true;
@@ -466,9 +467,16 @@ function Threat_OnEvent(event)
 end
 
 function Threat_OnUpdate()
-    -- addon is not yet fully loaded
+    -- Addon is not yet fully loaded
     if (not Threat_KnownDisarmImmuneTable) then
         return;
+    end
+
+    -- Limit frequency to 25Hz. Maybe, might some slower computer need it
+    if (GetTime() < LastOnUpdateTime + (1 / 25)) then
+        return;
+    else
+        LastOnUpdateTime = GetTime();
     end
 
     if (ChallengingShoutBroadcasted and SpellNearlyReady(ABILITY_CHALLENGING_SHOUT_THREAT)) then
