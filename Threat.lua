@@ -18,6 +18,7 @@ local ShieldWallBroadcasted = true;
 local ShieldWallEnding = -1;
 local LastStandBroadcasted = true;
 local LastStandEnding = -1;
+local GainHP = 0;
 
 -- Would be SavedVariables, not local
 Threat_KnownDisarmImmuneTable = nil;
@@ -504,15 +505,21 @@ function Threat_OnUpdate()
     if (LastStandBroadcasted and SpellNearlyReady(ABILITY_LAST_STAND_THREAT)) then
         LastStandBroadcasted = false;
     elseif (not LastStandBroadcasted and not SpellNearlyReady(ABILITY_LAST_STAND_THREAT)) then
+        -- GainHP variable is in closure so scope would be bigger for later ending announcement
+        GainHP = math.floor(UnitHealthMax("player") * 0.3);
+        local lastStandMessage = string.gsub(MESSAGE_LAST_STAND_THREAT, "$gain_hp", tostring(GainHP));
+
         LastStandBroadcasted = true;
-        SendChatMessage(MESSAGE_LAST_STAND_THREAT);
+        SendChatMessage(lastStandMessage);
 
         -- Ending announcement would be 3 sec earlier
         LastStandEnding = GetTime() + 20 - 3;
     end
 
     if (LastStandEnding > 0 and (GetTime() >= LastStandEnding)) then
+        local lastStandEndingMessage = string.gsub(MESSAGE_LAST_STAND_ENDING_THREAT, "$gain_hp", tostring(GainHP));
+
         LastStandEnding = -1;
-        SendChatMessage(MESSAGE_LAST_STAND_ENDING_THREAT);
+        SendChatMessage(lastStandEndingMessage);
     end
 end

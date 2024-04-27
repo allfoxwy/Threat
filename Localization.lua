@@ -57,8 +57,8 @@ MESSAGE_BY_THREAT                 = " by ";
 MESSAGE_CHALLENGING_SHOUT_THREAT  = "  Challenging Shout ends in ";
 MESSAGE_SHIELD_WALL_THREAT        = "Shield Wall activated";
 MESSAGE_SHIELD_WALL_ENDING_THREAT = "Shield Wall is ending";
-MESSAGE_LAST_STAND_THREAT         = "Last Stand activated";
-MESSAGE_LAST_STAND_ENDING_THREAT  = "Last Stand is ending";
+MESSAGE_LAST_STAND_THREAT         = "Last Stand activated, gained $gain_hp HP";
+MESSAGE_LAST_STAND_ENDING_THREAT  = "Last Stand is ending, losing $gain_hp HP";
 
 EVENT_SELF_DOGUE_THREAT       = "You dodge";
 EVENT_SELF_PARRY_THREAT       = "You parry";
