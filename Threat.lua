@@ -428,7 +428,7 @@ function Threat_OnEvent(event)
                 local _, _, reason, mobName = string.find(arg1, EVENT_FAILED_MOCKING_BLOW_THREAT);
 
                 if (reason) then
-                    reason = string.upper(reason).." "..MESSAGE_BY_THREAT;
+                    reason = string.upper(reason) .. " " .. MESSAGE_BY_THREAT;
                 else
                     reason = MESSAGE_MISSED_THREAT;
                 end
