@@ -96,9 +96,11 @@ local function SpellNearlyReady(spellname)
 end
 
 local function HasBuff(unit, texturename)
+    texturename = string.lower(texturename);
     local id = 1;
+
     while (UnitBuff(unit, id)) do
-        local buffTexture = UnitBuff(unit, id);
+        local buffTexture = string.lower(UnitBuff(unit, id));
         if (string.find(buffTexture, texturename)) then
             return true;
         end
@@ -503,9 +505,13 @@ function Threat_OnUpdate()
         SendChatMessage(MESSAGE_SHIELD_WALL_ENDING_THREAT);
     end
 
-    if (LastStandBroadcasted and SpellNearlyReady(ABILITY_LAST_STAND_THREAT)) then
+    -- There is a small latency between Last Stand entering cooldown and gaining HP. UnitHealthMax() could return 100% HP even in cooldown
+    -- So we also check against buff icon here
+    if (LastStandBroadcasted and
+        (SpellNearlyReady(ABILITY_LAST_STAND_THREAT) and not HasBuff("player", "Spell_holy_ashestoashes"))) then
         LastStandBroadcasted = false;
-    elseif (not LastStandBroadcasted and not SpellNearlyReady(ABILITY_LAST_STAND_THREAT)) then
+    elseif (not LastStandBroadcasted and
+        (not SpellNearlyReady(ABILITY_LAST_STAND_THREAT) and HasBuff("player", "Spell_holy_ashestoashes"))) then
         -- GainHP variable is in closure so scope would be bigger for later ending announcement
         -- At this very moment, UnitHealthMax() is called AFTER Last Stand activated, so it would be including the addtional 30% HP
         -- The formula should calculate against 130% HP (Thanks to Zaggy2 notice this https://forum.turtle-wow.org/viewtopic.php?p=93670#p93657)
