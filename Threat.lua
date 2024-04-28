@@ -507,7 +507,10 @@ function Threat_OnUpdate()
         LastStandBroadcasted = false;
     elseif (not LastStandBroadcasted and not SpellNearlyReady(ABILITY_LAST_STAND_THREAT)) then
         -- GainHP variable is in closure so scope would be bigger for later ending announcement
-        GainHP = math.floor(UnitHealthMax("player") * 0.3);
+        -- At this very moment, UnitHealthMax() is called AFTER Last Stand activated, so it would be including the addtional 30% HP
+        -- The formula should calculate against 130% HP (Thanks to Zaggy2 notice this https://forum.turtle-wow.org/viewtopic.php?p=93670#p93657)
+        -- Using TankBuddy formula
+        GainHP = math.floor(UnitHealthMax("player") / 130 * 30);
         local lastStandMessage = string.gsub(MESSAGE_LAST_STAND_THREAT, "$gain_hp", tostring(GainHP));
 
         LastStandBroadcasted = true;
