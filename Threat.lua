@@ -490,9 +490,13 @@ function Threat_OnUpdate()
         ChallengingShoutCountdown = ChallengingShoutCountdown - 1;
     end
 
-    if (ShieldWallBroadcasted and not HasBuff("player", "Ability_Warrior_ShieldWall")) then
+    -- Doing both cooldown and buff icon check
+    -- Cooldown alone is not enough as Shield Wall share cooldown with Recklessness and Retaliation
+    if (ShieldWallBroadcasted and
+        (SpellNearlyReady(ABILITY_SHIELD_WALL_THREAT) and not HasBuff("player", "Ability_Warrior_ShieldWall"))) then
         ShieldWallBroadcasted = false;
-    elseif (not ShieldWallBroadcasted and HasBuff("player", "Ability_Warrior_ShieldWall")) then
+    elseif (not ShieldWallBroadcasted and
+        (not SpellNearlyReady(ABILITY_SHIELD_WALL_THREAT) and HasBuff("player", "Ability_Warrior_ShieldWall"))) then
         ShieldWallBroadcasted = true;
         SendChatMessage(MESSAGE_SHIELD_WALL_THREAT);
 
@@ -506,7 +510,7 @@ function Threat_OnUpdate()
     end
 
     -- There is a small latency between Last Stand entering cooldown and gaining HP. UnitHealthMax() could return 100% HP even in cooldown
-    -- So we also check against buff icon here
+    -- So we also also check against buff icon here
     if (LastStandBroadcasted and
         (SpellNearlyReady(ABILITY_LAST_STAND_THREAT) and not HasBuff("player", "Spell_holy_ashestoashes"))) then
         LastStandBroadcasted = false;
