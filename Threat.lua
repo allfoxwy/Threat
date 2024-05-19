@@ -14,6 +14,7 @@ local ChallengingLastBroadcastTime = 0;
 local LastSunderArmorTime = 0;
 local LastBattleShoutAttemptTime = 0;
 local LastDisarmAttemptTime = 0;
+local LastHeroicStrikeTime = 0;
 local LastOnUpdateTime = 0;
 local ShieldWallBroadcasted = true;
 local ShieldWallEnding = -1;
@@ -279,6 +280,7 @@ function Threat()
         local rage = UnitMana("player");
         local hp = UnitHealth("player");
         local maxhp = UnitHealthMax("player");
+        local attackSpeed = UnitAttackSpeed("player");
 
         if (not ThreatAttack) then
             Debug("Starting AutoAttack");
@@ -296,7 +298,19 @@ function Threat()
         Debug("Bloodrage");
         CastSpellByName(ABILITY_BLOODRAGE_THREAT);
       ]]
-            if (SpellReady(ABILITY_REVENGE_THREAT) and RevengeAvail() and rage >= 5) then
+            if (SpellReady(ABILITY_HEROIC_STRIKE_THREAT) and rage >= 55 and
+                (GetTime() - LastHeroicStrikeTime > attackSpeed / 3 * 2)) then
+                --[[
+                    The idea of adding Heroic Strike a cooldown is from Fury (https://github.com/cubenicke/Fury/blob/master/Fury.lua)
+                    As weapon attack speed is the limiter to heroic strike, HS in fact can not fire continuously.
+                    However if there is no cooldown, HS would block other spell until it's fired.
+
+                    Also HS should in top position. Because it is possible we need rage dump even before mob got 5 sunder.
+                ]]
+                Debug("Heroic strike");
+                LastHeroicStrikeTime = GetTime();
+                CastSpellByName(ABILITY_HEROIC_STRIKE_THREAT);
+            elseif (SpellReady(ABILITY_REVENGE_THREAT) and RevengeAvail() and rage >= 5) then
                 Debug("Revenge");
                 CastSpellByName(ABILITY_REVENGE_THREAT);
             elseif (rage >= 10 and (hp / maxhp * 100) < 40 and EquippedShield() and
@@ -336,10 +350,6 @@ function Threat()
             elseif (SpellReady(ABILITY_BLOODTHIRST_THREAT) and rage >= 35 and BloodthirstLearned()) then
                 Debug("Bloodthirst");
                 CastSpellByName(ABILITY_BLOODTHIRST_THREAT);
-
-            elseif (SpellReady(ABILITY_HEROIC_STRIKE_THREAT) and rage >= 55) then
-                Debug("Heroic strike");
-                CastSpellByName(ABILITY_HEROIC_STRIKE_THREAT);
             end
         end
     end
