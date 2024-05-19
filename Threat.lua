@@ -300,7 +300,7 @@ function Threat()
         CastSpellByName(ABILITY_BLOODRAGE_THREAT);
       ]]
             if (SpellReady(ABILITY_HEROIC_STRIKE_THREAT) and rage >= 55 and
-                (GetTime() - LastHeroicStrikeTime > attackSpeed / 3 * 2)) then
+                (GetTime() - LastHeroicStrikeTime > attackSpeed / 2)) then
                 --[[
                     The idea of adding Heroic Strike a cooldown is from Fury (https://github.com/cubenicke/Fury/blob/master/Fury.lua)
                     As weapon attack speed is the limiter to heroic strike, HS in fact can not fire continuously.
