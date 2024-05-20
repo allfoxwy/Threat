@@ -6,8 +6,6 @@
 ]] --
 -- Variables
 local RevengeReadyUntil = 0;
-local InCombat = false;
-local LoginCombatCheckTime = 0;
 local ThreatLastSpellCast = 0
 local ChallengingShoutBroadcasted = true;
 local ChallengingShoutCountdown = -1;
@@ -293,6 +291,8 @@ function Threat()
             CastSpellByName(ABILITY_DEFENSIVE_STANCE_THREAT);
         end
 
+        local InCombat = UnitAffectingCombat("player");
+
         if (InCombat) then
             --[[
       if (SpellReady(ABILITY_BLOODRAGE_THREAT)) then
@@ -384,8 +384,6 @@ function Threat_OnLoad()
     this:RegisterEvent("ADDON_LOADED");
     this:RegisterEvent("PLAYER_ENTER_COMBAT");
     this:RegisterEvent("PLAYER_LEAVE_COMBAT");
-    this:RegisterEvent("PLAYER_REGEN_DISABLED");
-    this:RegisterEvent("PLAYER_REGEN_ENABLED");
     this:RegisterEvent("CHAT_MSG_COMBAT_CREATURE_VS_SELF_MISSES");
     this:RegisterEvent("CHAT_MSG_SPELL_SELF_DAMAGE");
 
@@ -412,10 +410,6 @@ function Threat_OnEvent(event)
         ThreatAttack = true;
     elseif (event == "PLAYER_LEAVE_COMBAT") then
         ThreatAttack = nil;
-    elseif (event == "PLAYER_REGEN_DISABLED") then
-        InCombat = true;
-    elseif (event == "PLAYER_REGEN_ENABLED") then
-        InCombat = false;
     elseif (event == "CHAT_MSG_SPELL_SELF_DAMAGE") then
         if (string.find(arg1, EVENT_CHECK_DISARM_FAILED_THREAT)) then
             local _, _, mobName = string.find(arg1, EVENT_CHECK_DISARM_FAILED_THREAT);
@@ -483,22 +477,6 @@ function Threat_OnUpdate()
         return;
     else
         LastOnUpdateTime = GetTime();
-    end
-
-    --[[
-        Schedule an in-combat check when login.
-        This is because if we already in combat when we login, the game won't fire in-combat events till we leave that combat,
-        and sadly UnitAffectingCombat("player") seems also not work during login.
-
-        So we delay the check for a small amount of time.
-    ]]
-    if (LoginCombatCheckTime == 0) then
-        LoginCombatCheckTime = GetTime() + 2;
-    end
-
-    if (LoginCombatCheckTime > 0 and (GetTime() > LoginCombatCheckTime)) then
-        LoginCombatCheckTime = -1;
-        InCombat = UnitAffectingCombat("player");
     end
 
     if (ChallengingShoutBroadcasted and SpellNearlyReady(ABILITY_CHALLENGING_SHOUT_THREAT)) then
