@@ -221,18 +221,6 @@ local function ImprovedSheildWallIncrasedTime()
     end
 end
 
--- return how many level of Improved Sunder Armor talent has been learnt
-local function ImprovedSunderArmorLevel()
-    if UnitClass("player") == CLASS_WARRIOR_THREAT then
-        local _, _, _, _, ss = GetTalentInfo(3, 10);
-        if (ss >= 1) then
-            return ss;
-        else
-            return 0;
-        end
-    end
-end
-
 -- read rage cost from spell book. it would show reduction from talent
 local function RageCost(spellName)
     -- Must do this SetOwner in this function, or tooltip would be blank
