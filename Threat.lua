@@ -240,7 +240,9 @@ local function RageCost(spellName)
 
     local spellID = SpellId(spellName);
     if not spellID then
-        return nil;
+        -- if we can't find this spell in book, we return a huge cost so we won't use it
+        Debug("Can't find " .. spellName .. " in book");
+        return 9999;
     end
 
     ThreatTooltip:SetSpell(spellID, BOOKTYPE_SPELL);
@@ -254,7 +256,7 @@ local function RageCost(spellName)
             local _, _, rage = string.find(leftText:GetText(), RAGE_DESCRIPTION_REGEX_THREAT);
 
             if rage then
-                return rage;
+                return tonumber(rage);
             end
         end
     end
@@ -329,7 +331,25 @@ function Threat()
         Debug("Bloodrage");
         CastSpellByName(ABILITY_BLOODRAGE_THREAT);
       ]]
-            if (SpellReady(ABILITY_HEROIC_STRIKE_THREAT) and rage >= 55 and
+            local revengeCost = RageCost(ABILITY_REVENGE_THREAT);
+            local blockCost = RageCost(ABILITY_SHIELD_BLOCK_THREAT);
+            local sunderCost = RageCost(ABILITY_SUNDER_ARMOR_THREAT);
+            local apCost = RageCost(ABILITY_BATTLE_SHOUT_THREAT);
+            local disarmCost = RageCost(ABILITY_DISARM_THREAT);
+            local hsCost = RageCost(ABILITY_HEROIC_STRIKE_THREAT);
+            local coreCost = (function()
+                if BloodthirstLearned() then
+                    return RageCost(ABILITY_BLOODTHIRST_THREAT);
+                end
+
+                if ShieldSlamLearned() then
+                    return RageCost(ABILITY_SHIELD_SLAM_THREAT);
+                end
+
+                return 0;
+            end)();
+
+            if (SpellReady(ABILITY_HEROIC_STRIKE_THREAT) and rage >= (coreCost + revengeCost + sunderCost + hsCost) and
                 (GetTime() - LastHeroicStrikeTime > attackSpeed / 2)) then
                 --[[
                     The idea of adding Heroic Strike a cooldown is from Fury (https://github.com/cubenicke/Fury/blob/master/Fury.lua)
@@ -341,24 +361,24 @@ function Threat()
                 Debug("Heroic strike");
                 LastHeroicStrikeTime = GetTime();
                 CastSpellByName(ABILITY_HEROIC_STRIKE_THREAT);
-            elseif (SpellReady(ABILITY_REVENGE_THREAT) and RevengeAvail() and rage >= 5) then
+            elseif (SpellReady(ABILITY_REVENGE_THREAT) and RevengeAvail() and rage >= revengeCost) then
                 Debug("Revenge");
                 CastSpellByName(ABILITY_REVENGE_THREAT);
-            elseif (rage >= 10 and (hp / maxhp * 100) < 40 and EquippedShield() and
+            elseif (rage >= blockCost and (hp / maxhp * 100) < 40 and EquippedShield() and
                 SpellReady(ABILITY_SHIELD_BLOCK_THREAT)) then
                 Debug("Sheld Block when HP < 40");
                 CastSpellByName(ABILITY_SHIELD_BLOCK_THREAT);
-            elseif (SpellReady(ABILITY_SUNDER_ARMOR_THREAT) and rage >= (15 - ImprovedSunderArmorLevel()) and
+            elseif (SpellReady(ABILITY_SUNDER_ARMOR_THREAT) and rage >= sunderCost and
                 (not HasOneSunderArmor("target") or LastSunderArmorTime + 25 <= GetTime())) then
                 Debug("First/Refresh Sunder armor");
-                CastSpellByName(ABILITY_SUNDER_ARMOR_THREAT);
                 LastSunderArmorTime = GetTime();
+                CastSpellByName(ABILITY_SUNDER_ARMOR_THREAT);
             elseif (SpellReady(ABILITY_BATTLE_SHOUT_THREAT) and not HasBuff("player", "Ability_Warrior_BattleShout") and
-                rage >= 15 and (GetTime() - LastBattleShoutAttemptTime > 3)) then
+                rage >= (apCost + revengeCost) and (GetTime() - LastBattleShoutAttemptTime > 3)) then
                 Debug("Battle Shout");
                 LastBattleShoutAttemptTime = GetTime();
                 CastSpellByName(ABILITY_BATTLE_SHOUT_THREAT);
-            elseif (not HasDisarm("target") and SpellReady(ABILITY_DISARM_THREAT) and rage >= 20 and
+            elseif (not HasDisarm("target") and SpellReady(ABILITY_DISARM_THREAT) and rage >= (disarmCost + revengeCost) and
                 (GetTime() - LastDisarmAttemptTime > 3) and
                 (string.find(UnitClassification("target"), CLASSIFICATION_ELITE_THREAT) or
                     string.find(UnitClassification("target"), CLASSIFICATION_WORLDBOSS_THREAT)) and
@@ -367,18 +387,18 @@ function Threat()
                 LastDisarmAttemptTime = GetTime();
                 CastSpellByName(ABILITY_DISARM_THREAT);
             elseif (UnitIsUnit("targettarget", "player") and SpellReady(ABILITY_SHIELD_BLOCK_THREAT) and
-                EquippedShield() and rage >= 15 and (hp / maxhp * 100) < 85) then
+                EquippedShield() and rage >= (blockCost + revengeCost) and (hp / maxhp * 100) < 85) then
                 Debug("Sheld Block normally");
                 CastSpellByName(ABILITY_SHIELD_BLOCK_THREAT);
-            elseif (SpellReady(ABILITY_SUNDER_ARMOR_THREAT) and rage >= (20 - ImprovedSunderArmorLevel()) and
+            elseif (SpellReady(ABILITY_SUNDER_ARMOR_THREAT) and rage >= (sunderCost + revengeCost) and
                 not HasFiveSunderArmors("target")) then
                 Debug("Sunder Armor");
                 CastSpellByName(ABILITY_SUNDER_ARMOR_THREAT);
                 LastSunderArmorTime = GetTime();
-            elseif (SpellReady(ABILITY_SHIELD_SLAM_THREAT) and rage >= 25 and ShieldSlamLearned()) then
+            elseif (SpellReady(ABILITY_SHIELD_SLAM_THREAT) and rage >= (coreCost + revengeCost) and ShieldSlamLearned()) then
                 Debug("Shield slam");
                 CastSpellByName(ABILITY_SHIELD_SLAM_THREAT);
-            elseif (SpellReady(ABILITY_BLOODTHIRST_THREAT) and rage >= 35 and BloodthirstLearned()) then
+            elseif (SpellReady(ABILITY_BLOODTHIRST_THREAT) and rage >= (coreCost + revengeCost) and BloodthirstLearned()) then
                 Debug("Bloodthirst");
                 CastSpellByName(ABILITY_BLOODTHIRST_THREAT);
             end
