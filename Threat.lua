@@ -233,6 +233,36 @@ local function ImprovedSunderArmorLevel()
     end
 end
 
+-- read rage cost from spell book. it would show reduction from talent
+local function RageCost(spellName)
+    -- Must do this SetOwner in this function, or tooltip would be blank
+    ThreatTooltip:SetOwner(UIParent, "ANCHOR_NONE");
+
+    local spellID = SpellId(spellName);
+    if not spellID then
+        return nil;
+    end
+
+    ThreatTooltip:SetSpell(spellID, BOOKTYPE_SPELL);
+
+    local lineCount = ThreatTooltip:NumLines();
+
+    for i = 1, lineCount do
+        local leftText = getglobal("ThreatTooltipTextLeft" .. i);
+
+        if leftText:GetText() then
+            local _, _, rage = string.find(leftText:GetText(), RAGE_DESCRIPTION_REGEX_THREAT);
+
+            if rage then
+                return rage;
+            end
+        end
+    end
+
+    -- Spells like taunt doesn't cost rage, they dont have rage cost in description
+    return 0;
+end
+
 local function EquippedShield()
     -- The idea of using tooltip to decide if offhand has a shiled is taken from Roid Macros (https://denniswg.github.io/Roid-Macros/)
     -- Must do this SetOwner in this function, or tooltip would be blank

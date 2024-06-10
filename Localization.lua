@@ -51,6 +51,8 @@ ITEM_ATTRIBUTE_MAINHAND_THREAT    = "Main Hand";
 ITEM_ATTRIBUTE_ONEHAND_THREAT     = "One-Hand";
 ITEM_ATTRIBUTE_TWOHAND_THREAT     = "Two-Hand";
 
+RAGE_DESCRIPTION_REGEX_THREAT     = "(%d+)%s*Rage";
+
 MESSAGE_TAUNT_RESIST_THREAT       = "Taunt RESISTED by $mob_name";
 MESSAGE_MOCKING_BLOW_FAILED_THREAT  = "Mocking Blow $reason $mob_name";
 MESSAGE_BY_THREAT                 = "by";
