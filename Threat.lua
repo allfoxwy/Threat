@@ -337,7 +337,7 @@ function Threat()
                 return 0;
             end)();
 
-            if (SpellReady(ABILITY_HEROIC_STRIKE_THREAT) and rage >= (coreCost + revengeCost + sunderCost + hsCost) and
+            if (SpellReady(ABILITY_HEROIC_STRIKE_THREAT) and rage >= (coreCost + sunderCost + revengeCost + hsCost) and
                 (GetTime() - LastHeroicStrikeTime > attackSpeed / 2)) then
                 --[[
                     The idea of adding Heroic Strike a cooldown is from Fury (https://github.com/cubenicke/Fury/blob/master/Fury.lua)
@@ -362,11 +362,11 @@ function Threat()
                 LastSunderArmorTime = GetTime();
                 CastSpellByName(ABILITY_SUNDER_ARMOR_THREAT);
             elseif (SpellReady(ABILITY_BATTLE_SHOUT_THREAT) and not HasBuff("player", "Ability_Warrior_BattleShout") and
-                rage >= (apCost + revengeCost) and (GetTime() - LastBattleShoutAttemptTime > 3)) then
+                rage >= (apCost + sunderCost) and (GetTime() - LastBattleShoutAttemptTime > 3)) then
                 Debug("Battle Shout");
                 LastBattleShoutAttemptTime = GetTime();
                 CastSpellByName(ABILITY_BATTLE_SHOUT_THREAT);
-            elseif (not HasDisarm("target") and SpellReady(ABILITY_DISARM_THREAT) and rage >= (disarmCost + revengeCost) and
+            elseif (not HasDisarm("target") and SpellReady(ABILITY_DISARM_THREAT) and rage >= (disarmCost + sunderCost) and
                 (GetTime() - LastDisarmAttemptTime > 3) and
                 (string.find(UnitClassification("target"), CLASSIFICATION_ELITE_THREAT) or
                     string.find(UnitClassification("target"), CLASSIFICATION_WORLDBOSS_THREAT)) and
@@ -375,7 +375,7 @@ function Threat()
                 LastDisarmAttemptTime = GetTime();
                 CastSpellByName(ABILITY_DISARM_THREAT);
             elseif (UnitIsUnit("targettarget", "player") and SpellReady(ABILITY_SHIELD_BLOCK_THREAT) and
-                EquippedShield() and rage >= (blockCost + revengeCost) and (hp / maxhp * 100) < 85) then
+                EquippedShield() and rage >= (blockCost + sunderCost) and (hp / maxhp * 100) < 85) then
                 Debug("Sheld Block normally");
                 CastSpellByName(ABILITY_SHIELD_BLOCK_THREAT);
             elseif (SpellReady(ABILITY_SUNDER_ARMOR_THREAT) and rage >= (sunderCost + revengeCost) and
@@ -383,10 +383,10 @@ function Threat()
                 Debug("Sunder Armor");
                 CastSpellByName(ABILITY_SUNDER_ARMOR_THREAT);
                 LastSunderArmorTime = GetTime();
-            elseif (SpellReady(ABILITY_SHIELD_SLAM_THREAT) and rage >= (coreCost + revengeCost) and ShieldSlamLearned()) then
+            elseif (SpellReady(ABILITY_SHIELD_SLAM_THREAT) and rage >= (coreCost + sunderCost) and ShieldSlamLearned()) then
                 Debug("Shield slam");
                 CastSpellByName(ABILITY_SHIELD_SLAM_THREAT);
-            elseif (SpellReady(ABILITY_BLOODTHIRST_THREAT) and rage >= (coreCost + revengeCost) and BloodthirstLearned()) then
+            elseif (SpellReady(ABILITY_BLOODTHIRST_THREAT) and rage >= (coreCost + sunderCost) and BloodthirstLearned()) then
                 Debug("Bloodthirst");
                 CastSpellByName(ABILITY_BLOODTHIRST_THREAT);
             end
