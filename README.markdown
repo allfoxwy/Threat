@@ -15,6 +15,8 @@ Built on Turtle WoW server. If you have issue report you could reply to this thr
 
 1. Tanking rotation could be done by calling `/warrthreat` slash command. Each time it is called it would try perform 1 action in the rotation. Recommended usage is to make a macro with a single line `/warrthreat`, then bind the macro to a key and repeatly press it during engage.
 
+1. Auto attack when `/warrthreat` require putting Attack action from spell book onto an action bar slot. Any slot would do.
+
 1. In case you perfer doing rotation yourself but would like to have announcements, you could ignore the slash command not using it at all. Announcements still work.
 
 

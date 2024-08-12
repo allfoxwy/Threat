@@ -300,11 +300,16 @@ function Threat()
         local hp = UnitHealth("player");
         local maxhp = UnitHealthMax("player");
         local attackSpeed = UnitAttackSpeed("player");
+        local i,j,k;
 
-        if (not ThreatAttack) then
-            Debug("Starting AutoAttack");
-            AttackTarget();
+        -- According to https://wowwiki-archive.fandom.com/wiki/ActionSlot
+        -- We have 120 Action Slots
+        for i=1,120 do
+            if IsAttackAction(i) and not IsCurrentAction(i) then
+                UseAction(i);
+            end
         end
+
 
         if (ActiveStance() ~= 2) then
             Debug("Changing to def stance");
