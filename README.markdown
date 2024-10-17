@@ -1,6 +1,6 @@
 # Threat
 
-**As Turtle WoW going 1.17.2, this addon's rotation is rendered useless. Future update would need some time till I learnt how to tank. Probaly never happen because I almost never join high level raid.**
+**As Turtle WoW going 1.17.2, this addon's rotation is rendered useless. Future update would need some time till I learnt how to tank. Probably never happen because I almost never join high level raid.**
 
 Addon for Warrior tank in World of Warcraft Vanilla (v1.12):
 1. Announce messages to `say` channel for important tank events
