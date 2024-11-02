@@ -401,7 +401,7 @@ function Threat()
                 Debug("Heroic strike");
                 LastHeroicStrikeTime = GetTime();
                 CastSpellByName(ABILITY_HEROIC_STRIKE_THREAT);
-            elseif (SpellReady(ABILITY_CONCUSSION_BLOW_THREAT) and rage >= concussionCost) then
+            elseif (ConcussionBlowLearned() and SpellReady(ABILITY_CONCUSSION_BLOW_THREAT) and rage >= concussionCost) then
                 Debug("Concussion Blow");
                 CastSpellByName(ABILITY_CONCUSSION_BLOW_THREAT);
             elseif (SpellReady(ABILITY_REVENGE_THREAT) and RevengeAvail() and rage >= revengeCost) then
