@@ -20,6 +20,7 @@ ABILITY_BERSERKER_STANCE_THREAT   = "Berserker Stance";
 ABILITY_BLOODRAGE_THREAT          = "Bloodrage";
 ABILITY_BLOODTHIRST_THREAT        = "Bloodthirst";
 ABILITY_CHALLENGING_SHOUT_THREAT  = "Challenging Shout";
+ABILITY_CONCUSSION_BLOW_THREAT	  = "Concussion Blow";
 ABILITY_DEFENSIVE_STANCE_THREAT   = "Defensive Stance";
 ABILITY_DEMORALIZING_SHOUT_THREAT = "Demoralizing Shout";
 ABILITY_DISARM_THREAT             = "Disarm";
@@ -52,6 +53,7 @@ ITEM_ATTRIBUTE_ONEHAND_THREAT     = "One-Hand";
 ITEM_ATTRIBUTE_TWOHAND_THREAT     = "Two-Hand";
 
 RAGE_DESCRIPTION_REGEX_THREAT     = "(%d+)%s*Rage";
+COOLDOWN_DESCRIPTION_REGEX_THREAT = "(%d+%.?%d*)%s*(%a+)%s*cooldown";
 
 MESSAGE_TAUNT_RESIST_THREAT       = "Taunt RESISTED by $mob_name";
 MESSAGE_MOCKING_BLOW_FAILED_THREAT  = "Mocking Blow $reason $mob_name";

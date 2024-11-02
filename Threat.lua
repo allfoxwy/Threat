@@ -1,7 +1,7 @@
 --[[
   Threat
   Origin By: Ollowain.
-  Modified for Turtle: allfox.
+  Modified for Turtle: allfox, and the thankful community
 	Credit: Fury.lua by Bhaerau.
 ]] --
 -- Variables
@@ -187,7 +187,18 @@ end
 
 local function ShieldSlamLearned()
     if UnitClass("player") == CLASS_WARRIOR_THREAT then
-        local _, _, _, _, ss = GetTalentInfo(3, 17);
+        local _, _, _, _, ss = GetTalentInfo(3, 14);
+        if (ss >= 1) then
+            return true;
+        else
+            return nil;
+        end
+    end
+end
+
+local function ConcussionBlowLearned()
+    if UnitClass("player") == CLASS_WARRIOR_THREAT then
+        local _, _, _, _, ss = GetTalentInfo(3, 19);
         if (ss >= 1) then
             return true;
         else
@@ -198,7 +209,7 @@ end
 
 local function BloodthirstLearned()
     if UnitClass("player") == CLASS_WARRIOR_THREAT then
-        local _, _, _, _, ss = GetTalentInfo(2, 17);
+        local _, _, _, _, ss = GetTalentInfo(2, 16);
         if (ss >= 1) then
             return true;
         else
@@ -210,11 +221,11 @@ end
 -- return how many time increasement of Improved Shield Wall talent has been learnt
 local function ImprovedSheildWallIncrasedTime()
     if UnitClass("player") == CLASS_WARRIOR_THREAT then
-        local _, _, _, _, ss = GetTalentInfo(3, 13);
+        local _, _, _, _, ss = GetTalentInfo(3, 17);
         if (ss == 1) then
-            return 3;
+            return 1;
         elseif (ss == 2) then
-            return 5;
+            return 2;
         else
             return 0;
         end
@@ -288,6 +299,41 @@ local function EquippedShield()
     return false;
 end
 
+local function SpellCooldownFromBook(spellName)
+    -- Must do this SetOwner in this function, or tooltip would be blank
+    ThreatTooltip:SetOwner(UIParent, "ANCHOR_NONE");
+
+    local spellID = SpellId(spellName);
+    if not spellID then
+        -- if we can't find this spell in book, we return a huge cooldown so we won't use it
+        Debug("Can't find " .. spellName .. " in book");
+        return 9999;
+    end
+
+    ThreatTooltip:SetSpell(spellID, BOOKTYPE_SPELL);
+
+    local lineCount = ThreatTooltip:NumLines();
+    
+    for i = 1, lineCount do
+        local text = getglobal("ThreatTooltipTextRight" .. i);
+
+        if text:GetText() then
+            local _, _, cooldown, unit = string.find(text:GetText(), COOLDOWN_DESCRIPTION_REGEX_THREAT);
+
+            if cooldown then
+                if unit == "min" then
+                    return tonumber(cooldown) * 60;
+                else
+                    return tonumber(cooldown);
+                end
+            end
+        end
+    end
+
+    -- Some spell have no cooldown, like Find Minerals.
+    return 0;
+end
+
 function Threat()
 
     -- addon is not yet fully loaded
@@ -330,6 +376,7 @@ function Threat()
             local apCost = RageCost(ABILITY_BATTLE_SHOUT_THREAT);
             local disarmCost = RageCost(ABILITY_DISARM_THREAT);
             local hsCost = RageCost(ABILITY_HEROIC_STRIKE_THREAT);
+            local concussionCost = RageCost(ABILITY_CONCUSSION_BLOW_THREAT);
             local coreCost = (function()
                 if BloodthirstLearned() then
                     return RageCost(ABILITY_BLOODTHIRST_THREAT);
@@ -354,6 +401,9 @@ function Threat()
                 Debug("Heroic strike");
                 LastHeroicStrikeTime = GetTime();
                 CastSpellByName(ABILITY_HEROIC_STRIKE_THREAT);
+            elseif (SpellReady(ABILITY_CONCUSSION_BLOW_THREAT) and rage >= concussionCost) then
+                Debug("Concussion Blow");
+                CastSpellByName(ABILITY_CONCUSSION_BLOW_THREAT);
             elseif (SpellReady(ABILITY_REVENGE_THREAT) and RevengeAvail() and rage >= revengeCost) then
                 Debug("Revenge");
                 CastSpellByName(ABILITY_REVENGE_THREAT);
@@ -504,7 +554,7 @@ function Threat_OnEvent(event)
         if string.find(arg1, EVENT_SELF_BLOCK_THREAT) or string.find(arg1, EVENT_SELF_PARRY_THREAT) or
             string.find(arg1, EVENT_SELF_DOGUE_THREAT) then
             Debug("Revenge soon ready");
-            RevengeReadyUntil = GetTime() + 4;
+            RevengeReadyUntil = GetTime() + SpellCooldownFromBook(ABILITY_REVENGE_THREAT);
         end
     end
 end
