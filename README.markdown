@@ -1,6 +1,6 @@
 # Threat
 
-**As Turtle WoW going 1.17.2, this addon won't work for it.**
+**Master branch is for Vanilla 1.12. For Turtle WoW please use [the turtle branch](https://github.com/allfoxwy/Threat/tree/turtle).**
 
 Addon for Warrior tank in World of Warcraft Vanilla (v1.12):
 1. Announce messages to `say` channel for important tank events
