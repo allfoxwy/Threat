@@ -133,15 +133,12 @@ local function HasDisarm(unit)
         end
         id = id + 1;
     end
-    return nil;
-end
 
--- This function is not used because I can't tell if the Rend on mob is ours
-local function HasRend(unit)
-    local id = 1;
-    while (UnitDebuff(unit, id)) do
-        local debuffTexture, debuffAmount = UnitDebuff(unit, id);
-        if (string.find(debuffTexture, DEBUFF_REND_THREAT)) then
+    -- On Turtle server, when debuff more than 16, they count as buff
+    id = 1;
+    while (UnitBuff(unit, id)) do
+        local debuffTexture, debuffAmount = UnitBuff(unit, id);
+        if (string.find(debuffTexture, DEBUFF_DISARM_THREAT)) then
             if (debuffAmount >= 1) then
                 return true;
             else
@@ -150,6 +147,7 @@ local function HasRend(unit)
         end
         id = id + 1;
     end
+
     return nil;
 end
 
@@ -176,6 +174,20 @@ local function HasOneSunderArmor(unit)
         end
         id = id + 1;
     end
+
+    -- On Turtle server, when debuff more than 16, they count as buff
+    id = 1;
+    while (UnitBuff(unit, id)) do
+        local debuffTexture, debuffAmount = UnitBuff(unit, id);
+        if (string.find(debuffTexture, DEBUFF_SUNDER_ARMOR_THREAT)) then
+            if (debuffAmount >= 1) then
+                return true;
+            else
+                return nil;
+            end
+        end
+        id = id + 1;
+    end
     return nil;
 end
 
@@ -183,6 +195,20 @@ local function HasFiveSunderArmors(unit)
     local id = 1;
     while (UnitDebuff(unit, id)) do
         local debuffTexture, debuffAmount = UnitDebuff(unit, id);
+        if (string.find(debuffTexture, DEBUFF_SUNDER_ARMOR_THREAT)) then
+            if (debuffAmount >= 5) then
+                return true;
+            else
+                return nil;
+            end
+        end
+        id = id + 1;
+    end
+
+    -- On Turtle server, when debuff more than 16, they count as buff
+    id = 1;
+    while (UnitBuff(unit, id)) do
+        local debuffTexture, debuffAmount = UnitBuff(unit, id);
         if (string.find(debuffTexture, DEBUFF_SUNDER_ARMOR_THREAT)) then
             if (debuffAmount >= 5) then
                 return true;
@@ -449,12 +475,13 @@ function Threat()
                 Debug("Heroic strike");
                 LastHeroicStrikeTime = GetTime();
                 CastSpellByName(ABILITY_HEROIC_STRIKE_THREAT);
-            elseif (SpellReady(ABILITY_COUNTERATTACK_THREAT) and CounterattackAvail() and rage >= counterattackCost and CounterattackLearned()) then
-                Debug("Counterattack");
-                CastSpellByName(ABILITY_COUNTERATTACK_THREAT);
             elseif (SpellReady(ABILITY_REVENGE_THREAT) and RevengeAvail() and rage >= revengeCost) then
                 Debug("Revenge");
                 CastSpellByName(ABILITY_REVENGE_THREAT);
+            elseif (SpellReady(ABILITY_COUNTERATTACK_THREAT) and CounterattackAvail() and rage >= counterattackCost and
+                CounterattackLearned()) then
+                Debug("Counterattack");
+                CastSpellByName(ABILITY_COUNTERATTACK_THREAT);
             elseif (SpellReady(ABILITY_SHIELD_SLAM_THREAT) and (hp / maxhp * 100) < 40 and rage >= blockCost and
                 ShieldSlamLearned() and ImprovedShieldSlam() and EquippedShield()) then
                 -- The cost is not a TYPO. It's for getting priority before Shield Block
