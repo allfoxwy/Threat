@@ -21,6 +21,7 @@ ABILITY_BLOODRAGE_THREAT          = "Bloodrage";
 ABILITY_BLOODTHIRST_THREAT        = "Bloodthirst";
 ABILITY_CHALLENGING_SHOUT_THREAT  = "Challenging Shout";
 ABILITY_CONCUSSION_BLOW_THREAT	  = "Concussion Blow";
+ABILITY_COUNTERATTACK_THREAT	  = "Counterattack";
 ABILITY_DEFENSIVE_STANCE_THREAT   = "Defensive Stance";
 ABILITY_DEMORALIZING_SHOUT_THREAT = "Demoralizing Shout";
 ABILITY_DISARM_THREAT             = "Disarm";
@@ -33,6 +34,7 @@ ABILITY_LAST_STAND_THREAT         = "Last Stand";
 ABILITY_MOCKING_BLOW_THREAT       = "Mocking Blow";
 ABILITY_OVERPOWER_THREAT          = "Overpower";
 ABILITY_REVENGE_THREAT            = "Revenge";
+ABILITY_REND_THREAT           	  = "Rend";
 ABILITY_SHIELD_BASH_THREAT        = "Shield Bash";
 ABILITY_SHIELD_BLOCK_THREAT       = "Shield Block";
 ABILITY_SHIELD_SLAM_THREAT        = "Shield Slam";
@@ -44,6 +46,7 @@ ABILITY_THUNDER_CLAP_THREAT       = "Thunder Clap";
 
 DEBUFF_SUNDER_ARMOR_THREAT        = "Sunder";
 DEBUFF_DISARM_THREAT              = "Disarm";
+DEBUFF_REND_THREAT                = "Gouge";
 
 ITEM_TYPE_SHIELD_THREAT           = "Shield";
 

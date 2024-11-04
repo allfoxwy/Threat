@@ -6,6 +6,7 @@
 ]] --
 -- Variables
 local RevengeReadyUntil = 0;
+local CounterattackReadyUntil = 0;
 local ThreatLastSpellCast = 0
 local ChallengingShoutBroadcasted = true;
 local ChallengingShoutCountdown = -1;
@@ -135,6 +136,23 @@ local function HasDisarm(unit)
     return nil;
 end
 
+-- This function is not used because I can't tell if the Rend on mob is ours
+local function HasRend(unit)
+    local id = 1;
+    while (UnitDebuff(unit, id)) do
+        local debuffTexture, debuffAmount = UnitDebuff(unit, id);
+        if (string.find(debuffTexture, DEBUFF_REND_THREAT)) then
+            if (debuffAmount >= 1) then
+                return true;
+            else
+                return nil;
+            end
+        end
+        id = id + 1;
+    end
+    return nil;
+end
+
 local function isKnownImmuneToDisarm(mobName)
     for i, v in pairs(Threat_KnownDisarmImmuneTable) do
         if (mobName == v) then
@@ -185,9 +203,28 @@ local function RevengeAvail()
     end
 end
 
+local function CounterattackAvail()
+    if GetTime() < CounterattackReadyUntil then
+        return true;
+    else
+        return nil;
+    end
+end
+
 local function ShieldSlamLearned()
     if UnitClass("player") == CLASS_WARRIOR_THREAT then
         local _, _, _, _, ss = GetTalentInfo(3, 14);
+        if (ss >= 1) then
+            return true;
+        else
+            return nil;
+        end
+    end
+end
+
+local function BloodthirstLearned()
+    if UnitClass("player") == CLASS_WARRIOR_THREAT then
+        local _, _, _, _, ss = GetTalentInfo(2, 16);
         if (ss >= 1) then
             return true;
         else
@@ -207,9 +244,20 @@ local function ConcussionBlowLearned()
     end
 end
 
-local function BloodthirstLearned()
+local function CounterattackLearned()
     if UnitClass("player") == CLASS_WARRIOR_THREAT then
-        local _, _, _, _, ss = GetTalentInfo(2, 16);
+        local _, _, _, _, ss = GetTalentInfo(1, 8);
+        if (ss >= 1) then
+            return true;
+        else
+            return nil;
+        end
+    end
+end
+
+local function ImprovedShieldSlam()
+    if UnitClass("player") == CLASS_WARRIOR_THREAT then
+        local _, _, _, _, ss = GetTalentInfo(1, 15);
         if (ss >= 1) then
             return true;
         else
@@ -313,7 +361,7 @@ local function SpellCooldownFromBook(spellName)
     ThreatTooltip:SetSpell(spellID, BOOKTYPE_SPELL);
 
     local lineCount = ThreatTooltip:NumLines();
-    
+
     for i = 1, lineCount do
         local text = getglobal("ThreatTooltipTextRight" .. i);
 
@@ -346,16 +394,15 @@ function Threat()
         local hp = UnitHealth("player");
         local maxhp = UnitHealthMax("player");
         local attackSpeed = UnitAttackSpeed("player");
-        local i,j,k;
+        local i, j, k;
 
         -- According to https://wowwiki-archive.fandom.com/wiki/ActionSlot
         -- We have 120 Action Slots
-        for i=1,120 do
+        for i = 1, 120 do
             if IsAttackAction(i) and not IsCurrentAction(i) then
                 UseAction(i);
             end
         end
-
 
         if (ActiveStance() ~= 2) then
             Debug("Changing to def stance");
@@ -377,6 +424,7 @@ function Threat()
             local disarmCost = RageCost(ABILITY_DISARM_THREAT);
             local hsCost = RageCost(ABILITY_HEROIC_STRIKE_THREAT);
             local concussionCost = RageCost(ABILITY_CONCUSSION_BLOW_THREAT);
+            local counterattackCost = RageCost(ABILITY_COUNTERATTACK_THREAT);
             local coreCost = (function()
                 if BloodthirstLearned() then
                     return RageCost(ABILITY_BLOODTHIRST_THREAT);
@@ -401,16 +449,24 @@ function Threat()
                 Debug("Heroic strike");
                 LastHeroicStrikeTime = GetTime();
                 CastSpellByName(ABILITY_HEROIC_STRIKE_THREAT);
-            elseif (ConcussionBlowLearned() and SpellReady(ABILITY_CONCUSSION_BLOW_THREAT) and rage >= concussionCost) then
-                Debug("Concussion Blow");
-                CastSpellByName(ABILITY_CONCUSSION_BLOW_THREAT);
+            elseif (SpellReady(ABILITY_COUNTERATTACK_THREAT) and CounterattackAvail() and rage >= counterattackCost and CounterattackLearned()) then
+                Debug("Counterattack");
+                CastSpellByName(ABILITY_COUNTERATTACK_THREAT);
             elseif (SpellReady(ABILITY_REVENGE_THREAT) and RevengeAvail() and rage >= revengeCost) then
                 Debug("Revenge");
                 CastSpellByName(ABILITY_REVENGE_THREAT);
+            elseif (SpellReady(ABILITY_SHIELD_SLAM_THREAT) and (hp / maxhp * 100) < 40 and rage >= blockCost and
+                ShieldSlamLearned() and ImprovedShieldSlam() and EquippedShield()) then
+                -- The cost is not a TYPO. It's for getting priority before Shield Block
+                Debug("Shield slam for its blocking when HP < 40");
+                CastSpellByName(ABILITY_SHIELD_SLAM_THREAT);
             elseif (rage >= blockCost and (hp / maxhp * 100) < 40 and EquippedShield() and
                 SpellReady(ABILITY_SHIELD_BLOCK_THREAT)) then
                 Debug("Sheld Block when HP < 40");
                 CastSpellByName(ABILITY_SHIELD_BLOCK_THREAT);
+            elseif (ConcussionBlowLearned() and SpellReady(ABILITY_CONCUSSION_BLOW_THREAT) and rage >= concussionCost) then
+                Debug("Concussion Blow");
+                CastSpellByName(ABILITY_CONCUSSION_BLOW_THREAT);
             elseif (SpellReady(ABILITY_SUNDER_ARMOR_THREAT) and rage >= sunderCost and
                 (not HasOneSunderArmor("target") or LastSunderArmorTime + 25 <= GetTime())) then
                 Debug("First/Refresh Sunder armor");
@@ -421,14 +477,11 @@ function Threat()
                 Debug("Battle Shout");
                 LastBattleShoutAttemptTime = GetTime();
                 CastSpellByName(ABILITY_BATTLE_SHOUT_THREAT);
-            elseif (not HasDisarm("target") and SpellReady(ABILITY_DISARM_THREAT) and rage >= (disarmCost + sunderCost) and
-                (GetTime() - LastDisarmAttemptTime > 3) and
-                (string.find(UnitClassification("target"), CLASSIFICATION_ELITE_THREAT) or
-                    string.find(UnitClassification("target"), CLASSIFICATION_WORLDBOSS_THREAT)) and
-                not isKnownImmuneToDisarm(UnitName("target"))) then
-                Debug("Disarm");
-                LastDisarmAttemptTime = GetTime();
-                CastSpellByName(ABILITY_DISARM_THREAT);
+            elseif (SpellReady(ABILITY_SHIELD_SLAM_THREAT) and rage >= (blockCost + sunderCost) and (hp / maxhp * 100) <
+                85 and ShieldSlamLearned() and ImprovedShieldSlam() and EquippedShield()) then
+                -- The cost is not a TYPO. It's for getting priority before Shield Block
+                Debug("Shield slam for its blocking");
+                CastSpellByName(ABILITY_SHIELD_SLAM_THREAT);
             elseif (UnitIsUnit("targettarget", "player") and SpellReady(ABILITY_SHIELD_BLOCK_THREAT) and
                 EquippedShield() and rage >= (blockCost + sunderCost) and (hp / maxhp * 100) < 85) then
                 Debug("Sheld Block normally");
@@ -438,12 +491,21 @@ function Threat()
                 Debug("Sunder Armor");
                 CastSpellByName(ABILITY_SUNDER_ARMOR_THREAT);
                 LastSunderArmorTime = GetTime();
-            elseif (SpellReady(ABILITY_SHIELD_SLAM_THREAT) and rage >= (coreCost + sunderCost) and ShieldSlamLearned()) then
+            elseif (SpellReady(ABILITY_SHIELD_SLAM_THREAT) and rage >= (coreCost + sunderCost) and ShieldSlamLearned() and
+                EquippedShield()) then
                 Debug("Shield slam");
                 CastSpellByName(ABILITY_SHIELD_SLAM_THREAT);
             elseif (SpellReady(ABILITY_BLOODTHIRST_THREAT) and rage >= (coreCost + sunderCost) and BloodthirstLearned()) then
                 Debug("Bloodthirst");
                 CastSpellByName(ABILITY_BLOODTHIRST_THREAT);
+            elseif (not HasDisarm("target") and SpellReady(ABILITY_DISARM_THREAT) and rage >= (disarmCost + sunderCost) and
+                (GetTime() - LastDisarmAttemptTime > 3) and
+                (string.find(UnitClassification("target"), CLASSIFICATION_ELITE_THREAT) or
+                    string.find(UnitClassification("target"), CLASSIFICATION_WORLDBOSS_THREAT)) and
+                not isKnownImmuneToDisarm(UnitName("target"))) then
+                Debug("Disarm");
+                LastDisarmAttemptTime = GetTime();
+                CastSpellByName(ABILITY_DISARM_THREAT);
             end
         end
     end
@@ -555,6 +617,10 @@ function Threat_OnEvent(event)
             string.find(arg1, EVENT_SELF_DOGUE_THREAT) then
             Debug("Revenge soon ready");
             RevengeReadyUntil = GetTime() + SpellCooldownFromBook(ABILITY_REVENGE_THREAT);
+        end
+        if string.find(arg1, EVENT_SELF_PARRY_THREAT) then
+            Debug("Counterattack soon ready");
+            CounterattackReadyUntil = GetTime() + SpellCooldownFromBook(ABILITY_COUNTERATTACK_THREAT);
         end
     end
 end

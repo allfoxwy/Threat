@@ -1,7 +1,7 @@
-## Interface: 12000
+## Interface: 11200
 ## Title: Threat
 ## Notes: To make Warrior tanking easier.
-## Author: Ollowain, allfox
+## Author: Ollowain, allfox and the thankful community
 ## DefaultState: enabled
 ## OptionalDeps: none
 ## SavedVariables: Threat_KnownDisarmImmuneTable
