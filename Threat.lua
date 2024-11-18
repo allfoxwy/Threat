@@ -408,6 +408,15 @@ local function SpellCooldownFromBook(spellName)
     return 0;
 end
 
+-- This function return actual sunder cost when we near sunder refresh time
+local function SunderCostProvision()
+    if GetTime() > LastSunderArmorTime + 20 then
+        return RageCost(ABILITY_SUNDER_ARMOR_THREAT);
+    else
+        return 0;
+    end
+end
+
 function Threat()
 
     -- addon is not yet fully loaded
@@ -451,19 +460,20 @@ function Threat()
             local hsCost = RageCost(ABILITY_HEROIC_STRIKE_THREAT);
             local concussionCost = RageCost(ABILITY_CONCUSSION_BLOW_THREAT);
             local counterattackCost = RageCost(ABILITY_COUNTERATTACK_THREAT);
-            local coreCost = (function()
+            local coreCost, coreReady = (function()
                 if BloodthirstLearned() then
-                    return RageCost(ABILITY_BLOODTHIRST_THREAT);
+                    return RageCost(ABILITY_BLOODTHIRST_THREAT), SpellNearlyReady(ABILITY_BLOODTHIRST_THREAT);
                 end
 
                 if ShieldSlamLearned() then
-                    return RageCost(ABILITY_SHIELD_SLAM_THREAT);
+                    return RageCost(ABILITY_SHIELD_SLAM_THREAT), SpellNearlyReady(ABILITY_SHIELD_SLAM_THREAT);
                 end
 
                 return 0;
             end)();
 
-            if (SpellReady(ABILITY_HEROIC_STRIKE_THREAT) and rage >= (coreCost + sunderCost + revengeCost + hsCost) and
+            if (SpellReady(ABILITY_HEROIC_STRIKE_THREAT) and rage >=
+                (coreCost + SunderCostProvision() + revengeCost + hsCost) and
                 (GetTime() - LastHeroicStrikeTime > attackSpeed / 2)) then
                 --[[
                     The idea of adding Heroic Strike a cooldown is from Fury (https://github.com/cubenicke/Fury/blob/master/Fury.lua)
@@ -478,10 +488,6 @@ function Threat()
             elseif (SpellReady(ABILITY_REVENGE_THREAT) and RevengeAvail() and rage >= revengeCost) then
                 Debug("Revenge");
                 CastSpellByName(ABILITY_REVENGE_THREAT);
-            elseif (SpellReady(ABILITY_COUNTERATTACK_THREAT) and CounterattackAvail() and rage >= counterattackCost and
-                CounterattackLearned()) then
-                Debug("Counterattack");
-                CastSpellByName(ABILITY_COUNTERATTACK_THREAT);
             elseif (SpellReady(ABILITY_SHIELD_SLAM_THREAT) and (hp / maxhp * 100) < 40 and rage >= blockCost and
                 ShieldSlamLearned() and ImprovedShieldSlam() and EquippedShield()) then
                 -- The cost is not a TYPO. It's for getting priority before Shield Block
@@ -499,18 +505,25 @@ function Threat()
                 Debug("First/Refresh Sunder armor");
                 LastSunderArmorTime = GetTime();
                 CastSpellByName(ABILITY_SUNDER_ARMOR_THREAT);
+            elseif (SpellReady(ABILITY_COUNTERATTACK_THREAT) and CounterattackAvail() and rage >=
+                (counterattackCost + SunderCostProvision()) and CounterattackLearned() and
+                not HasFiveSunderArmors("target")) then
+                -- Before 5 Sunder, Counterattack has priority. Because Sunder blocks core spell.
+                Debug("Counterattack");
+                CastSpellByName(ABILITY_COUNTERATTACK_THREAT);
             elseif (SpellReady(ABILITY_BATTLE_SHOUT_THREAT) and not HasBuff("player", "Ability_Warrior_BattleShout") and
-                rage >= (apCost + sunderCost) and (GetTime() - LastBattleShoutAttemptTime > 3)) then
+                rage >= (apCost + SunderCostProvision()) and (GetTime() - LastBattleShoutAttemptTime > 3)) then
                 Debug("Battle Shout");
                 LastBattleShoutAttemptTime = GetTime();
                 CastSpellByName(ABILITY_BATTLE_SHOUT_THREAT);
-            elseif (SpellReady(ABILITY_SHIELD_SLAM_THREAT) and rage >= (blockCost + sunderCost) and (hp / maxhp * 100) <
-                85 and ShieldSlamLearned() and ImprovedShieldSlam() and EquippedShield()) then
+            elseif (SpellReady(ABILITY_SHIELD_SLAM_THREAT) and rage >=
+                math.max(blockCost + SunderCostProvision(), coreCost) and (hp / maxhp * 100) < 85 and
+                ShieldSlamLearned() and ImprovedShieldSlam() and EquippedShield()) then
                 -- The cost is not a TYPO. It's for getting priority before Shield Block
                 Debug("Shield slam for its blocking");
                 CastSpellByName(ABILITY_SHIELD_SLAM_THREAT);
             elseif (UnitIsUnit("targettarget", "player") and SpellReady(ABILITY_SHIELD_BLOCK_THREAT) and
-                EquippedShield() and rage >= (blockCost + sunderCost) and (hp / maxhp * 100) < 85) then
+                EquippedShield() and rage >= (blockCost + SunderCostProvision()) and (hp / maxhp * 100) < 85) then
                 Debug("Sheld Block normally");
                 CastSpellByName(ABILITY_SHIELD_BLOCK_THREAT);
             elseif (SpellReady(ABILITY_SUNDER_ARMOR_THREAT) and rage >= (sunderCost + revengeCost) and
@@ -518,15 +531,20 @@ function Threat()
                 Debug("Sunder Armor");
                 CastSpellByName(ABILITY_SUNDER_ARMOR_THREAT);
                 LastSunderArmorTime = GetTime();
-            elseif (SpellReady(ABILITY_SHIELD_SLAM_THREAT) and rage >= (coreCost + sunderCost) and ShieldSlamLearned() and
-                EquippedShield()) then
+            elseif (SpellReady(ABILITY_SHIELD_SLAM_THREAT) and rage >= (coreCost + SunderCostProvision()) and
+                ShieldSlamLearned() and EquippedShield()) then
                 Debug("Shield slam");
                 CastSpellByName(ABILITY_SHIELD_SLAM_THREAT);
-            elseif (SpellReady(ABILITY_BLOODTHIRST_THREAT) and rage >= (coreCost + sunderCost) and BloodthirstLearned()) then
+            elseif (SpellReady(ABILITY_BLOODTHIRST_THREAT) and rage >= (coreCost + SunderCostProvision()) and
+                BloodthirstLearned()) then
                 Debug("Bloodthirst");
                 CastSpellByName(ABILITY_BLOODTHIRST_THREAT);
-            elseif (not HasDisarm("target") and SpellReady(ABILITY_DISARM_THREAT) and rage >= (disarmCost + sunderCost) and
-                (GetTime() - LastDisarmAttemptTime > 3) and
+            elseif (SpellReady(ABILITY_COUNTERATTACK_THREAT) and CounterattackAvail() and rage >=
+                (counterattackCost + SunderCostProvision()) and CounterattackLearned()) then
+                Debug("Counterattack");
+                CastSpellByName(ABILITY_COUNTERATTACK_THREAT);
+            elseif (not coreReady and not HasDisarm("target") and SpellReady(ABILITY_DISARM_THREAT) and rage >=
+                (disarmCost + SunderCostProvision()) and (GetTime() - LastDisarmAttemptTime > 3) and
                 (string.find(UnitClassification("target"), CLASSIFICATION_ELITE_THREAT) or
                     string.find(UnitClassification("target"), CLASSIFICATION_WORLDBOSS_THREAT)) and
                 not isKnownImmuneToDisarm(UnitName("target"))) then
