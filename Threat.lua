@@ -5,6 +5,7 @@
 	Credit: Fury.lua by Bhaerau.
 ]] --
 -- Variables
+local updateTimer = -1;
 local RevengeReadyUntil = 0;
 local CounterattackReadyUntil = 0;
 local ThreatLastSpellCast = 0
@@ -21,6 +22,7 @@ local ShieldWallEnding = -1;
 local LastStandBroadcasted = true;
 local LastStandEnding = -1;
 local GainHP = 0;
+
 
 -- Would be SavedVariables, not local
 Threat_KnownDisarmImmuneTable = nil;
@@ -586,6 +588,7 @@ function Threat_OnLoad()
     this:RegisterEvent("PLAYER_LEAVE_COMBAT");
     this:RegisterEvent("CHAT_MSG_COMBAT_CREATURE_VS_SELF_MISSES");
     this:RegisterEvent("CHAT_MSG_SPELL_SELF_DAMAGE");
+    this:RegisterEvent("PLAYER_LEAVING_WORLD");
 
     SlashCmdList["WARRTHREAT"] = Threat_SlashCommand;
     SLASH_WARRTHREAT1 = "/warrthreat";
@@ -604,12 +607,27 @@ function Threat_OnEvent(event)
         LastStandBroadcasted = not SpellReady(ABILITY_LAST_STAND_THREAT);
         ShieldWallBroadcasted = not SpellReady(ABILITY_SHIELD_WALL_THREAT);
 
+        if pcall("UnitXP", "inSight", "player", "player") then
+            if updateTimer < 0 then
+                updateTimer = UnitXP("timer", "arm", 100, 100, "Threat_OnUpdate");
+            end
+        else
+            if ThreatFrame:GetScript("OnUpdate") == nil then
+                ThreatFrame:SetScript("OnUpdate", Threat_OnUpdate);
+            end
+        end
+
         Print(
             "Threat loaded. Make a macro to call \124cFFC69B6D/warrthreat\124r command to perform tanking rotation as lv60 Warrior.");
     elseif (event == "PLAYER_ENTER_COMBAT") then
         ThreatAttack = true;
     elseif (event == "PLAYER_LEAVE_COMBAT") then
         ThreatAttack = nil;
+    elseif  (event == "PLAYER_LEAVING_WORLD") then
+        if updateTimer >= 0 then
+            UnitXP("timer", "disarm", updateTimer);
+            updateTimer = -1;
+        end;
     elseif (event == "CHAT_MSG_SPELL_SELF_DAMAGE") then
         if (string.find(arg1, EVENT_CHECK_DISARM_FAILED_THREAT)) then
             local _, _, mobName = string.find(arg1, EVENT_CHECK_DISARM_FAILED_THREAT);
@@ -676,8 +694,8 @@ function Threat_OnUpdate()
         return;
     end
 
-    -- Limit frequency to 25Hz. Slow computer might need it
-    if (GetTime() < LastOnUpdateTime + (1 / 25)) then
+    -- Limit frequency to 20Hz. Slow computer might need it
+    if (GetTime() < LastOnUpdateTime + (1 / 20)) then
         return;
     else
         LastOnUpdateTime = GetTime();
