@@ -5,7 +5,9 @@
 	Credit: Fury.lua by Bhaerau.
 ]] --
 -- Variables
-local updateTimer = -1;
+
+local UpdateTimer = -1;
+local UnitXP_SP3 = false;
 local RevengeReadyUntil = 0;
 local CounterattackReadyUntil = 0;
 local ThreatLastSpellCast = 0
@@ -607,14 +609,13 @@ function Threat_OnEvent(event)
         LastStandBroadcasted = not SpellReady(ABILITY_LAST_STAND_THREAT);
         ShieldWallBroadcasted = not SpellReady(ABILITY_SHIELD_WALL_THREAT);
 
-        if pcall(UnitXP, "inSight", "player", "player") then
-            if updateTimer < 0 then
-                updateTimer = UnitXP("timer", "arm", 100, 100, "Threat_OnUpdate");
-            end
+        UnitXP_SP3 = pcall(UnitXP, "inSight", "player", "player");
+
+        if UnitXP_SP3 then
+            UpdateTimer = UnitXP("timer", "arm", 100, 100, "Threat_OnUpdate");
+            Print("Using UnitXP SP3 timer for Threat.");
         else
-            if ThreatFrame:GetScript("OnUpdate") == nil then
-                ThreatFrame:SetScript("OnUpdate", Threat_OnUpdate);
-            end
+            ThreatFrame:SetScript("OnUpdate", Threat_OnUpdate);
         end
 
         Print(
@@ -624,9 +625,8 @@ function Threat_OnEvent(event)
     elseif (event == "PLAYER_LEAVE_COMBAT") then
         ThreatAttack = nil;
     elseif  (event == "PLAYER_LEAVING_WORLD") then
-        if updateTimer >= 0 then
-            UnitXP("timer", "disarm", updateTimer);
-            updateTimer = -1;
+        if UnitXP_SP3 then
+            UnitXP("timer", "disarm", UpdateTimer);
         end;
     elseif (event == "CHAT_MSG_SPELL_SELF_DAMAGE") then
         if (string.find(arg1, EVENT_CHECK_DISARM_FAILED_THREAT)) then
