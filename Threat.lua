@@ -607,7 +607,7 @@ function Threat_OnEvent(event)
         LastStandBroadcasted = not SpellReady(ABILITY_LAST_STAND_THREAT);
         ShieldWallBroadcasted = not SpellReady(ABILITY_SHIELD_WALL_THREAT);
 
-        if pcall("UnitXP", "inSight", "player", "player") then
+        if pcall(UnitXP, "inSight", "player", "player") then
             if updateTimer < 0 then
                 updateTimer = UnitXP("timer", "arm", 100, 100, "Threat_OnUpdate");
             end
