@@ -625,6 +625,7 @@ function Threat_OnEvent(event)
     elseif  (event == "PLAYER_LOGOUT") then
         if UpdateTimer >= 0 then
             UnitXP("timer", "disarm", UpdateTimer);
+            UpdateTimer = -1;
         end;
     elseif (event == "CHAT_MSG_SPELL_SELF_DAMAGE") then
         if (string.find(arg1, EVENT_CHECK_DISARM_FAILED_THREAT)) then
