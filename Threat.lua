@@ -586,11 +586,10 @@ end
 
 function Threat_OnLoad()
     this:RegisterEvent("ADDON_LOADED");
-    this:RegisterEvent("PLAYER_ENTER_COMBAT");
-    this:RegisterEvent("PLAYER_LEAVE_COMBAT");
     this:RegisterEvent("CHAT_MSG_COMBAT_CREATURE_VS_SELF_MISSES");
     this:RegisterEvent("CHAT_MSG_SPELL_SELF_DAMAGE");
-    this:RegisterEvent("PLAYER_LEAVING_WORLD");
+    this:RegisterEvent("PLAYER_LOGIN");
+    this:RegisterEvent("PLAYER_LOGOUT");
 
     SlashCmdList["WARRTHREAT"] = Threat_SlashCommand;
     SLASH_WARRTHREAT1 = "/warrthreat";
@@ -604,28 +603,27 @@ function Threat_OnEvent(event)
             Threat_KnownDisarmImmuneTable = {};
         end
 
+        this:UnregisterEvent("ADDON_LOADED");
+    elseif (event == "PLAYER_LOGIN") then
         ThreatLastSpellCast = GetTime();
         ChallengingShoutBroadcasted = not SpellReady(ABILITY_CHALLENGING_SHOUT_THREAT);
         LastStandBroadcasted = not SpellReady(ABILITY_LAST_STAND_THREAT);
         ShieldWallBroadcasted = not SpellReady(ABILITY_SHIELD_WALL_THREAT);
 
-        UnitXP_SP3 = pcall(UnitXP, "inSight", "player", "player");
+        UnitXP_SP3 = pcall(UnitXP, "nop", "nop");
 
         if UnitXP_SP3 then
-            UpdateTimer = UnitXP("timer", "arm", 100, 100, "Threat_OnUpdate");
+            if UpdateTimer < 0 then
+                UpdateTimer = UnitXP("timer", "arm", 100, 100, "Threat_OnUpdate");
+            end
             Print("Using UnitXP SP3 timer for Threat.");
         else
             ThreatFrame:SetScript("OnUpdate", Threat_OnUpdate);
         end
 
-        Print(
-            "Threat loaded. Make a macro to call \124cFFC69B6D/warrthreat\124r command to perform tanking rotation as lv60 Warrior.");
-    elseif (event == "PLAYER_ENTER_COMBAT") then
-        ThreatAttack = true;
-    elseif (event == "PLAYER_LEAVE_COMBAT") then
-        ThreatAttack = nil;
-    elseif  (event == "PLAYER_LEAVING_WORLD") then
-        if UnitXP_SP3 then
+        Print("Threat loaded. Make a macro to call \124cFFC69B6D/warrthreat\124r command to perform tanking rotation as lv60 Warrior.");
+    elseif  (event == "PLAYER_LOGOUT") then
+        if UpdateTimer >= 0 then
             UnitXP("timer", "disarm", UpdateTimer);
         end;
     elseif (event == "CHAT_MSG_SPELL_SELF_DAMAGE") then
